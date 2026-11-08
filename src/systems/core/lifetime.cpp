@@ -1,0 +1,17 @@
+#include <mee/systems/core/lifetime.hpp>
+#include <mee/components/core/lifetime.hpp>
+#include <mee/ecs/ecs.hpp>
+
+void lifetimeSystem(ECS& ecs, WorldResources& res, float dt){
+    std::vector<Entity> toDelete;
+    ecs.view<LifetimeCompnent>([&](Entity e){
+        auto& l = ecs.getComponent<LifetimeCompnent>(e);
+        l.elapsed += dt;
+        if(l.elapsed >= l.lifetime){
+            toDelete.push_back(e);
+        }
+    });
+    for(Entity e : toDelete){
+        ecs.removeEntity(e);
+    }
+}
