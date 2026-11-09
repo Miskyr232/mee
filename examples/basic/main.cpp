@@ -35,19 +35,6 @@ int main(){
     );
 
     w.pipeline.onDraw(renderSpriteSystem);
-    w.pipeline.onUpdate(
-        [](ECS& ecs, WorldResources& res, float dt){
-            ecs.view<TransformComponent, PlayerTagComponent>(
-                [&](Entity e, auto& t, auto& p){
-                    if(res.input.isKeyPressed(KEY_SPACE)){
-                        res.camera.shake(10.0f);
-                    }
-                    t.pos.x += 100.0f * dt;
-                }
-            );
-        }
-    );
-    w.pipeline.onUpdate(cameraTargetSystem);
 
     w.run();
 }
