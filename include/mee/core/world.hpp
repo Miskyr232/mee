@@ -2,24 +2,19 @@
 
 #include "mee/ecs/ecs.hpp"
 #include <mee/core/pipeline.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
+#include "mee/core/config/engine-config.hpp"
 
-struct WorldSettings{
-    int width = 1200;
-    int height = 800;
-    std::string title = "window";
-    Color4f backgroundColor = Color4f::White();
-};
-
-class World{
-    WorldSettings settings;
+class Engine{
 public:
+    EngineConfig config;
     ECS ecs;
     Pipeline pipeline;
-    WorldResources res;
+    EngineResources res;
 
-    World();
-    ~World();
+    ~Engine();
     void run();
+
+    void init();
     void renderColliders();
 };

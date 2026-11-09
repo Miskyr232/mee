@@ -1,4 +1,4 @@
 #include <mee/ecs/ecs.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
 
-void aabbCollideSystem(ECS& ecs, WorldResources& res, float dt);
+void aabbCollideSystem(ECS& ecs, EngineResources& res, float dt);

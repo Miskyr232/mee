@@ -3,10 +3,17 @@
 #include <mee/utils/vector.hpp>
 #include <raylib.h>
 
-class WorldResources;
+class EngineResources;
 
 class WorldCamera{
     float amplitude = 0.0f;
+
+    Vector2f startPos;
+    Vector2f targetPos;
+    float moveDuration = 0.0f;
+    float moveTimer = 0.0f;
+    bool isMoving = false;
+
     public:
     Vector2f pos = Vector2f::zero();
     Vector2f shakePos = Vector2f::zero();
@@ -16,6 +23,7 @@ class WorldCamera{
 
     Vector2f worldToScreen(Vector2f world);
     Vector2f screenToWorld(Vector2f screen);
-    void update(WorldResources& res, float dt);
+    void update(EngineResources& res, float dt);
     void shake(float amplitude);
+    void moveTo(Vector2f target, float duration);
 };

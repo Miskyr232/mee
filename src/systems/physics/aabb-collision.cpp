@@ -103,7 +103,7 @@ void resolveAABB(
     ra.velocity += impulse * invMassA;
     rb.velocity -= impulse * invMassB;
 }
-void aabbCollideSystem(ECS &ecs, WorldResources &res, float dt){
+void aabbCollideSystem(ECS &ecs, EngineResources &res, float dt){
     std::vector<CollisionObject> objects;
     ecs.view<TransformComponent, AABBColliderComponent, RigidbodyComponent>(
         [&](Entity e){

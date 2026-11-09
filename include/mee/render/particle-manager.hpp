@@ -10,7 +10,7 @@
 
 class ParticleEmitter;
 
-struct WorldResources;
+struct EngineResources;
 
 struct EmitterHandle{
     size_t index;
@@ -59,7 +59,7 @@ struct Particle{
 class ParticleEmitter{
     public:
     std::function<void(Particle&, float)> onUpdate;
-    std::function<void(const Particle&, WorldResources&)> onDraw;
+    std::function<void(const Particle&, EngineResources&)> onDraw;
     ParticleEmitterSettings settings;
 };
 
@@ -67,9 +67,9 @@ class ParticleManager{
     std::vector<Particle> particles;
     public:
     SparseSet<ParticleEmitter, EmitterHandle> emitters;
-    void emit(EmitterHandle handle, WorldResources& res);
+    void emit(EmitterHandle handle, EngineResources& res);
     void update(float dt);
-    void draw(WorldResources& res);
+    void draw(EngineResources& res);
     EmitterHandle createEmitter(const ParticleEmitterSettings& settings);
 };
 

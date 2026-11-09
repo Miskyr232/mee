@@ -1,7 +1,7 @@
 #include <mee/render/particle-manager.hpp>
 
 #include <mee/utils/vector.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
 #include <algorithm>
 #include <raylib.h>
 
@@ -25,7 +25,7 @@ void ParticleManager::update(float dt){
     }
 }
 
-void ParticleManager::draw(WorldResources& res){
+void ParticleManager::draw(EngineResources& res){
     for(auto& particle : particles){
         ParticleEmitter* emitter = emitters.get(particle.handle);
         if (emitter && emitter->onDraw) {
@@ -63,7 +63,7 @@ void ParticleManager::draw(WorldResources& res){
     }
 }
 
-void ParticleManager::emit(EmitterHandle handle, WorldResources& res) {
+void ParticleManager::emit(EmitterHandle handle, EngineResources& res) {
     ParticleEmitter* emitter = emitters.get(handle);
     const auto& settings = emitter->settings;
     for (int i = 0; i < settings.count; i++){

@@ -2,7 +2,7 @@
 #include <mee/components/core/transform.hpp>
 #include <mee/components/physics/rigidbody.hpp>
 
-void moveSystem(ECS &ecs, WorldResources &res, float dt){
+void moveSystem(ECS &ecs, EngineResources &res, float dt){
     ecs.view<TransformComponent, RigidbodyComponent>(
         [&](Entity e, TransformComponent& t, RigidbodyComponent& r) {
             r.acceleration =

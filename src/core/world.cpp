@@ -2,10 +2,10 @@
 #include <mee/components/core/transform.hpp>
 #include <mee/components/physics/aabb-collider.hpp>
 #include <mee/utils/vector.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
 #include <raylib.h>
 
-void renderBackgroundSystem(WorldResources& res) {
+void renderBackgroundSystem(EngineResources& res) {
     Texture2D texture =
         res.textureManager.getTexture(res.background.texture);
 
@@ -43,20 +43,27 @@ void renderBackgroundSystem(WorldResources& res) {
         }
     }
 }
-World::World(){
+
+void Engine::init(){
+    if(config.window.resizable)
+        SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+
     InitAudioDevice();
-    InitWindow(settings.width, settings.height, settings.title.c_str());
+    InitWindow(config.window.width, config.window.height, config.window.title.c_str());
     SetExitKey(KEY_NULL);
-    SetTargetFPS(60);
+    SetTargetFPS(config.window.targetFPS);
+
+    if(config.window.fullscreen)
+        ToggleFullscreen();
 }
 
-World::~World(){
+Engine::~Engine(){
     res.engineEnd.emit();
     CloseAudioDevice();
     CloseWindow();
 }
 
-void World::renderColliders() {
+void Engine::renderColliders() {
     ecs.view<AABBColliderComponent, TransformComponent>(
         [&](Entity e, AABBColliderComponent& aabb, TransformComponent& transform) {
             float zoom = res.camera.zoom;
@@ -76,7 +83,7 @@ void World::renderColliders() {
     );
 }
 
-void World::run(){
+void Engine::run(){
     pipeline.runStart(ecs, res);
     res.background.texture = res.textureManager.loadTexture("game/assets/space.png");
     res.renderer.init();
@@ -89,12 +96,15 @@ void World::run(){
         BeginDrawing();
         res.renderer.beginFrame();
 
-        ClearBackground(settings.backgroundColor.toRaylib());
+        ClearBackground(config.window.backgroundColor.toRaylib());
         pipeline.runDraw(ecs, res);
         res.particleManager.draw(res);
-        DrawFPS(10, 10);
 
         res.renderer.flush(res.textureManager, res.camera);
+        if(config.debug.enabled && config.debug.showColliders)
+            renderColliders();
+        if(config.debug.enabled && config.debug.showFPS)
+            DrawFPS(10, 10);
         EndDrawing();
     }
 }

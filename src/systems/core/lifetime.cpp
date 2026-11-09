@@ -2,7 +2,7 @@
 #include <mee/components/core/lifetime.hpp>
 #include <mee/ecs/ecs.hpp>
 
-void lifetimeSystem(ECS& ecs, WorldResources& res, float dt){
+void lifetimeSystem(ECS& ecs, EngineResources& res, float dt){
     std::vector<Entity> toDelete;
     ecs.view<LifetimeCompnent>([&](Entity e, LifetimeCompnent l){
         l.elapsed += dt;

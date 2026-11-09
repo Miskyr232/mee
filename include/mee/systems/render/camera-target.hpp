@@ -1,4 +1,4 @@
 #include <mee/ecs/ecs.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
 
-void cameraTargetSystem(ECS& ecs, WorldResources& res, float dt);
+void cameraTargetSystem(ECS& ecs, EngineResources& res, float dt);

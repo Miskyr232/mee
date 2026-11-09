@@ -28,8 +28,8 @@ target_sources(mee PRIVATE
 
     src/sound/sound-manager.cpp
 
-    src/world-resources/input-state.cpp
-    src/world-resources/camera.cpp
+    src/engine-resources/input-state.cpp
+    src/engine-resources/camera.cpp
 
     src/utils/math.cpp
     src/utils/color.cpp

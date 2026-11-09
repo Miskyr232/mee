@@ -1,16 +1,16 @@
 #include <mee/core/pipeline.hpp>
 
-void Pipeline::runStart(ECS& ecs, WorldResources& res){
+void Pipeline::runStart(ECS& ecs, EngineResources& res){
     for(auto& system : startSystems){
         system(ecs, res);
     }
 }
-void Pipeline::runUpdate(ECS& ecs, WorldResources& res, float dt){
+void Pipeline::runUpdate(ECS& ecs, EngineResources& res, float dt){
     for(auto& system : updateSystems){
         system(ecs, res, dt);
     }
 }
-void Pipeline::runDraw(ECS& ecs, WorldResources& res){
+void Pipeline::runDraw(ECS& ecs, EngineResources& res){
     for(auto& system : drawSystems){
         system(ecs, res);
     }

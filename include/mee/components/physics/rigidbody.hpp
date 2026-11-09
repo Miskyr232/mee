@@ -12,7 +12,7 @@ struct RigidbodyComponent{
     float angularVelocity = 0.0f;
     float angularAccumulator = 0.0f;
     float inertiaTensor = 0.0f;
-    float drag = 0.0f;
+    float drag = 0.5f;
 
     float friction = 0.8f;
 

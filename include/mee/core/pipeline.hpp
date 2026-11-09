@@ -4,11 +4,11 @@
 #include <functional>
 #include <vector>
 
-struct WorldResources;
+struct EngineResources;
 
-using UpdateSystem = std::function<void(ECS&, WorldResources&, float)>;
-using StartSystem = std::function<void(ECS&, WorldResources&)>;
-using DrawSystem = std::function<void(ECS&, WorldResources&)>;
+using UpdateSystem = std::function<void(ECS&, EngineResources&, float)>;
+using StartSystem = std::function<void(ECS&, EngineResources&)>;
+using DrawSystem = std::function<void(ECS&, EngineResources&)>;
 
 class Pipeline{
 private:
@@ -20,7 +20,7 @@ public:
     void addStartSystem(StartSystem system);
     void onUpdate(UpdateSystem system);
 
-    void runUpdate(ECS& ecs, WorldResources& res, float dt);
-    void runStart(ECS& ecs, WorldResources& res);
-    void runDraw(ECS& ecs, WorldResources& res);
+    void runUpdate(ECS& ecs, EngineResources& res, float dt);
+    void runStart(ECS& ecs, EngineResources& res);
+    void runDraw(ECS& ecs, EngineResources& res);
 };

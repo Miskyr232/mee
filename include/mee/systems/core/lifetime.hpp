@@ -1,4 +1,4 @@
 #include <mee/ecs/ecs.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
 
-void lifetimeSystem(ECS& ecs, WorldResources& res, float dt);
+void lifetimeSystem(ECS& ecs, EngineResources& res, float dt);

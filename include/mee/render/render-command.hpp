@@ -40,8 +40,15 @@ struct RectCmd{
     Color4f color;
 };
 
+struct LineCmd{
+    Vector2f start;
+    Vector2f end;
+    Color4f color;
+    float thickness = 2.0f;
+};
+
 struct RenderCmd{
     float zIndex = 0.0f;
     bool isUI = false;
-    std::variant<TextureCmd, CircleCmd, TextCmd, RingCmd, RectCmd> variant;
+    std::variant<TextureCmd, CircleCmd, TextCmd, RingCmd, RectCmd, LineCmd> variant;
 };

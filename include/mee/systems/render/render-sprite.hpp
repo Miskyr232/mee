@@ -1,4 +1,4 @@
 #include <mee/ecs/ecs.hpp>
-#include <mee/world-resources/world-resources.hpp>
+#include <mee/engine-resources/engine-resources.hpp>
 
-void renderSpriteSystem(ECS& ecs, WorldResources& res);
+void renderSpriteSystem(ECS& ecs, EngineResources& res);

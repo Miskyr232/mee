@@ -11,5 +11,5 @@
 
 #include <mee/sound/sound-manager.hpp>
 
-#include <mee/world-resources/camera.hpp>
-#include <mee/world-resources/input-state.hpp>
+#include <mee/engine-resources/camera.hpp>
+#include <mee/engine-resources/input-state.hpp>

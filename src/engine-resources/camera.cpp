@@ -1,5 +1,5 @@
-#include "mee/world-resources/world-resources.hpp"
-#include <mee/world-resources/camera.hpp>
+#include "mee/engine-resources/engine-resources.hpp"
+#include <mee/engine-resources/camera.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/utils/math.hpp>
 
@@ -39,7 +39,7 @@ void WorldCamera::shake(float amplitude_){
     amplitude = amplitude_;
 }
 
-void WorldCamera::update(WorldResources& res, float dt){
+void WorldCamera::update(EngineResources& res, float dt){
     if(amplitude > 0.05){
         Vector2f randomDir = {
             res.random.getRandomInt(-100, 100) / 100.0f,
@@ -50,5 +50,27 @@ void WorldCamera::update(WorldResources& res, float dt){
     } else{
         amplitude = 0.0f;
         shakePos = {0.0, 0.0};
+    }
+
+    if(isMoving){
+        moveTimer += dt;
+        float t = moveTimer / moveDuration;
+        t = t * t * (3.0f - 2.0f * t);
+        if(t >= 1.0f){
+            pos = targetPos;
+            isMoving = false;
+        }
+        pos = startPos + (targetPos - startPos) * t;
+    }
+}
+
+void WorldCamera::moveTo(Vector2f target, float duration){
+    startPos = pos;
+    targetPos = target;
+    moveDuration = duration;
+    moveTimer = 0.0f;
+    isMoving = duration > 0.0f;
+    if(!isMoving){
+        pos = targetPos;
     }
 }
