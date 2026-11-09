@@ -1,3 +1,4 @@
+#include "mee/world-resources/world-resources.hpp"
 #include <mee/world-resources/camera.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/utils/math.hpp>
@@ -32,4 +33,22 @@ Vector2f WorldCamera::screenToWorld(Vector2f screen){
         static_cast<float>(rotatedX + pos.x + shakePos.x),
         static_cast<float>(rotatedY + pos.y + shakePos.y)
     };
+}
+
+void WorldCamera::shake(float amplitude_){
+    amplitude = amplitude_;
+}
+
+void WorldCamera::update(WorldResources& res, float dt){
+    if(amplitude > 0.05){
+        Vector2f randomDir = {
+            res.random.getRandomInt(-100, 100) / 100.0f,
+            res.random.getRandomInt(-100, 100) / 100.0f
+        };
+        shakePos = randomDir * amplitude;
+        amplitude -= 10.0f * dt;
+    } else{
+        amplitude = 0.0f;
+        shakePos = {0.0, 0.0};
+    }
 }

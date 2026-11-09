@@ -105,13 +105,15 @@ void resolveAABB(
 }
 void aabbCollideSystem(ECS &ecs, WorldResources &res, float dt){
     std::vector<CollisionObject> objects;
-    ecs.view<TransformComponent, AABBColliderComponent, RigidbodyComponent>([&](Entity e){
-        objects.push_back({
-            e,
-            &ecs.getComponent<TransformComponent>(e),
-            &ecs.getComponent<AABBColliderComponent>(e),
-            &ecs.getComponent<RigidbodyComponent>(e)
-        });
+    ecs.view<TransformComponent, AABBColliderComponent, RigidbodyComponent>(
+        [&](Entity e){
+            objects.push_back({
+                e,
+                &ecs.getComponent<TransformComponent>(e),
+                &ecs.getComponent<AABBColliderComponent>(e),
+                &ecs.getComponent<RigidbodyComponent>(e)
+            }
+        );
     });
     for(int i = 0; i < objects.size(); i++){
         for (int j = i + 1; j < objects.size(); j++) {

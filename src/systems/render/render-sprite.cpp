@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <mee/components/render/sprite.hpp>
 #include <mee/components/core/transform.hpp>
 #include <mee/world-resources/world-resources.hpp>
@@ -6,10 +7,7 @@
 #include <mee/systems/render/render-sprite.hpp>
 
 void renderSpriteSystem(ECS& ecs, WorldResources& res) {
-    ecs.view<TransformComponent, SpriteComponent>([&](Entity e) {
-        auto& t = ecs.getComponent<TransformComponent>(e);
-        auto& s = ecs.getComponent<SpriteComponent>(e);
-
+    ecs.view<TransformComponent, SpriteComponent>([&](Entity e, TransformComponent& t, SpriteComponent& s) {
         Texture2D texture = res.textureManager.getTexture(s.texture);
         res.renderer.renderTexture(
             {

@@ -3,11 +3,13 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <memory>
 #include <typeindex>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <type_traits>
 
 inline constexpr std::size_t nopos = static_cast<std::size_t>(-1);
 
@@ -99,6 +101,12 @@ class ECS{
         return *static_cast<Storage<T>*>(ptr.get());
     }
     public:
+    template<typename... Components>
+    Entity createEntity(Components&&... comps) {
+        Entity e = createEntity();
+        (addComponent(e, std::forward<Components>(comps)), ...);
+        return e;
+    }
     Entity createEntity();
     void removeEntity(Entity e);
     bool isAlive(Entity e) const;
@@ -142,6 +150,10 @@ class ECS{
 
         for (Entity e : sets[min]->getOwners())
             if ((hasComponent<Components>(e) && ...))
-                f(e);
+                if constexpr (std::is_invocable_v<F, Entity, Components&...>) {
+                    f(e, getComponent<Components>(e)...);
+                }else if constexpr (std::is_invocable_v<F, Entity>) {
+                    f(e);
+                }
     }
 };

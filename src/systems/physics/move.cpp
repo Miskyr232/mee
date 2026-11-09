@@ -4,23 +4,20 @@
 
 void moveSystem(ECS &ecs, WorldResources &res, float dt){
     ecs.view<TransformComponent, RigidbodyComponent>(
-        [&](Entity e) {
-            auto& transform = ecs.getComponent<TransformComponent>(e);
-            auto& rigidbody = ecs.getComponent<RigidbodyComponent>(e);
+        [&](Entity e, TransformComponent& t, RigidbodyComponent& r) {
+            r.acceleration =
+                r.forceAccumulator * r.invMass;
 
-            rigidbody.acceleration =
-                rigidbody.forceAccumulator * rigidbody.invMass;
+            r.velocity += r.acceleration * dt;
+            t.pos += r.velocity.tof() * dt;
 
-            rigidbody.velocity += rigidbody.acceleration * dt;
-            transform.pos += rigidbody.velocity.tof() * dt;
+            r.velocity *=
+                1.0f / (1.0f + r.drag * dt);
 
-            rigidbody.velocity *=
-                1.0f / (1.0f + rigidbody.drag * dt);
+            r.forceAccumulator = Vector2d::zero();
+            r.acceleration = Vector2d::zero();
 
-            rigidbody.forceAccumulator = Vector2d::zero();
-            rigidbody.acceleration = Vector2d::zero();
-
-            transform.rotation += rigidbody.angularVelocity * dt;
+            t.rotation += r.angularVelocity * dt;
         }
     );
 }

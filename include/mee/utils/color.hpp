@@ -4,7 +4,7 @@
 
 struct Color4f{
     float r, g, b, a;
-    constexpr Color4f() = default;
+    constexpr Color4f() : r(0.0f), g(0.0f), b(0.0f), a(0.0f) {};
     constexpr Color4f(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {};
     Color toRaylib() const;
     static Color4f fromRaylib(Color color);

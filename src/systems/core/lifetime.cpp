@@ -4,8 +4,7 @@
 
 void lifetimeSystem(ECS& ecs, WorldResources& res, float dt){
     std::vector<Entity> toDelete;
-    ecs.view<LifetimeCompnent>([&](Entity e){
-        auto& l = ecs.getComponent<LifetimeCompnent>(e);
+    ecs.view<LifetimeCompnent>([&](Entity e, LifetimeCompnent l){
         l.elapsed += dt;
         if(l.elapsed >= l.lifetime){
             toDelete.push_back(e);

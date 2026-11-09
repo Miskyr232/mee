@@ -16,12 +16,12 @@ void Pipeline::runDraw(ECS& ecs, WorldResources& res){
     }
 }
 
-void Pipeline::addUpdateSystem(UpdateSystem system){
-    updateSystems.push_back(system);
+void Pipeline::onDraw(DrawSystem system){
+    drawSystems.push_back(system);
 }
 void Pipeline::addStartSystem(StartSystem system){
     startSystems.push_back(system);
 }
-void Pipeline::addDrawSystem(DrawSystem system){
-    drawSystems.push_back(system);
+void Pipeline::onUpdate(UpdateSystem system){
+    updateSystems.push_back(system);
 }

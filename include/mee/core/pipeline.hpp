@@ -16,9 +16,9 @@ private:
     std::vector<StartSystem> startSystems;
     std::vector<DrawSystem> drawSystems;
 public:
-    void addUpdateSystem(UpdateSystem system);
+    void onDraw(DrawSystem system);
     void addStartSystem(StartSystem system);
-    void addDrawSystem(DrawSystem system);
+    void onUpdate(UpdateSystem system);
 
     void runUpdate(ECS& ecs, WorldResources& res, float dt);
     void runStart(ECS& ecs, WorldResources& res);

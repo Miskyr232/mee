@@ -58,9 +58,7 @@ World::~World(){
 
 void World::renderColliders() {
     ecs.view<AABBColliderComponent, TransformComponent>(
-        [&](Entity e) {
-            auto& aabb = ecs.getComponent<AABBColliderComponent>(e);
-            auto& transform = ecs.getComponent<TransformComponent>(e);
+        [&](Entity e, AABBColliderComponent& aabb, TransformComponent& transform) {
             float zoom = res.camera.zoom;
             Vector2f center = res.camera.worldToScreen(
                 transform.pos + aabb.offset.tof()
@@ -86,6 +84,7 @@ void World::run(){
         res.input.fill();
         pipeline.runUpdate(ecs, res, GetFrameTime());
         res.particleManager.update(GetFrameTime());
+        res.camera.update(res, GetFrameTime());
 
         BeginDrawing();
         res.renderer.beginFrame();

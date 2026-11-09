@@ -7,7 +7,9 @@ project(mee
 )
 
 option(MEE_BUILD_TESTS "Build mee tests" ON)
-option(MEE_BUILD_EXAMPLES "Build mee examples" OFF)
+option(MEE_BUILD_EXAMPLES "Build mee examples" ON)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(raylib REQUIRED)
 
