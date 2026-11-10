@@ -15,7 +15,9 @@ class Renderer{
     Shader circleShader;
     Shader rectShader;
     Shader ringShader;
+    Shader tileShader;
     int ringInRadiusLoc;
+    int tileSizeLoc;
 public:
     void init();
     void beginFrame();

@@ -6,11 +6,7 @@
 struct SpriteComponent{
     TextureID texture;
     Vector2f offset;
+    Vector2f scale = Vector2f(1.0f, 1.0f);
+    Vector2f tileSize = Vector2f(1.0f, 1.0f);
     float zIndex;
-
-    bool flipX = false;
-    bool flipY = false;
-
-    bool repeatX = false;
-    bool repeatY = false;
 };

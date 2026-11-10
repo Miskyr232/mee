@@ -47,9 +47,28 @@ void Renderer::init(){
             finalColor = fragColor;
         }
     )";
+    static const char* tileFs = R"(
+        #version 330
+
+        in vec2 fragTexCoord;
+        in vec4 fragColor;
+
+        out vec4 finalColor;
+
+        uniform sampler2D texture0;
+        uniform vec2 tileSize;
+
+        void main() {
+            vec2 uv = fragTexCoord / tileSize;
+
+            finalColor = texture(texture0, uv) * fragColor;
+        }
+    )";
     circleShader = LoadShaderFromMemory(NULL, circleFs);
     rectShader = LoadShaderFromMemory(NULL, rectFs);
     ringShader = LoadShaderFromMemory(NULL, ringFs);
+    tileShader = LoadShaderFromMemory(NULL, tileFs);
+    tileSizeLoc = GetShaderLocation(tileShader, "tileSize");
     ringInRadiusLoc = GetShaderLocation(ringShader, "inRadius");
 }
 
@@ -121,33 +140,66 @@ void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
             );
         }else if(auto* textureCmd = std::get_if<TextureCmd>(&command.variant)){
             flushPending(camera);
+
             Texture2D texture = textureManager.getTexture(textureCmd->texture);
+
             Vector2f screenPos = camera.worldToScreen(textureCmd->pos);
 
+            float zoom = camera.zoom;
+
             Rectangle source = {
-                0.0f, 0.0f,
+                0, 0,
                 (float)texture.width,
                 (float)texture.height
             };
 
-            float zoom = camera.zoom;
             Rectangle dest = {
-                screenPos.x, screenPos.y,
-                (float)texture.width * zoom * textureCmd->scale.x,
-                (float)texture.height * zoom * textureCmd->scale.y
+                screenPos.x,
+                screenPos.y,
+                texture.width * zoom * textureCmd->scale.x,
+                texture.height * zoom * textureCmd->scale.y
             };
+
             Vector2 origin = {
                 texture.width * zoom * textureCmd->scale.x * textureCmd->origin.x,
                 texture.height * zoom * textureCmd->scale.y * textureCmd->origin.y
             };
-            DrawTexturePro(
-                texture,
-                source,
-                dest,
-                origin,
-                textureCmd->rotation - camera.rotation,
-                textureCmd->tint.toRaylib()
-            );
+
+            if(textureCmd->tileSize.x != 1.0f ||
+               textureCmd->tileSize.y != 1.0f){
+
+                SetTextureWrap(texture, TEXTURE_WRAP_REPEAT);
+
+                BeginShaderMode(tileShader);
+
+                SetShaderValue(
+                    tileShader,
+                    tileSizeLoc,
+                    &textureCmd->tileSize,
+                    SHADER_UNIFORM_VEC2
+                );
+
+                DrawTexturePro(
+                    texture,
+                    source,
+                    dest,
+                    origin,
+                    textureCmd->rotation - camera.rotation,
+                    textureCmd->tint.toRaylib()
+                );
+
+                EndShaderMode();
+
+            }else{
+                DrawTexturePro(
+                    texture,
+                    source,
+                    dest,
+                    origin,
+                    textureCmd->rotation - camera.rotation,
+                    textureCmd->tint.toRaylib()
+                );
+            }
         }
     }
     flushCircles(circles, camera);

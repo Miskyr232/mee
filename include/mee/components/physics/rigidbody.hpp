@@ -21,14 +21,14 @@ struct RigidbodyComponent{
 
     double restitution = 1.0;
 
-    RigidbodyComponent() = default;
-    RigidbodyComponent(float customMass, float customInertia = 1.0f) {
-        mass = customMass;
-        inertiaTensor = customInertia;
-
-        invMass = (mass > 0.0f) ? (1.0f / mass) : 0.0f;
-        invInertiaTensor = (inertiaTensor > 0.0f) ? (1.0f / inertiaTensor) : 0.0f;
-    }
+    // RigidbodyComponent() = default;
+    // RigidbodyComponent(float customMass, float customInertia = 1.0f) {
+    //     mass = customMass;
+    //     inertiaTensor = customInertia;
+    //
+    //     invMass = (mass > 0.0f) ? (1.0f / mass) : 0.0f;
+    //     invInertiaTensor = (inertiaTensor > 0.0f) ? (1.0f / inertiaTensor) : 0.0f;
+    // }
     void applyForce(Vector2d force){
         forceAccumulator += force;
     }

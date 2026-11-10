@@ -1,8 +1,6 @@
-#include <cstdio>
 #include <mee/components/render/sprite.hpp>
 #include <mee/components/core/transform.hpp>
 #include <mee/engine-resources/engine-resources.hpp>
-#include <algorithm>
 #include <raylib.h>
 #include <mee/systems/render/render-sprite.hpp>
 
@@ -13,10 +11,11 @@ void renderSpriteSystem(ECS& ecs, EngineResources& res) {
             {
                 s.texture,
                 t.pos,
-                t.scale,
+                t.scale * s.scale,
                 Vector2f(0.5f, 0.5f),
                 t.rotation,
-                Color4f::White()
+                Color4f::White(),
+                s.tileSize
             },
             s.zIndex,
             false

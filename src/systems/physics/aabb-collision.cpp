@@ -6,8 +6,8 @@
 #include <vector>
 
 struct AABB {
-    Vector2d min;
-    Vector2d max;
+    Vector2f min;
+    Vector2f max;
 };
 
 struct CollisionObject {
@@ -22,8 +22,8 @@ AABB getAABB(
     const TransformComponent& t,
     const AABBColliderComponent& c
 ) {
-    Vector2d center = t.pos.tod() + c.offset;
-    Vector2d half = c.halfSize * t.scale.tod();
+    Vector2f center = t.pos + c.offset;
+    Vector2f half = c.halfSize * t.scale;
 
     return {
         center - half,
@@ -53,10 +53,10 @@ void resolveAABB(
     double overlapY = std::min(a.max.y, b.max.y)
                     - std::max(a.min.y, b.min.y);
 
-    Vector2d centerA = (a.min + a.max) / 2.0;
-    Vector2d centerB = (b.min + b.max) / 2.0;
+    Vector2f centerA = (a.min + a.max) / 2.0;
+    Vector2f centerB = (b.min + b.max) / 2.0;
 
-    Vector2d normal = Vector2d::zero();
+    Vector2f normal = Vector2f::zero();
     double overlap;
 
     if (overlapX < overlapY) {
@@ -74,7 +74,7 @@ void resolveAABB(
     if (totalInvMass <= 0.0)
         return;
 
-    Vector2d correction = normal * overlap;
+    Vector2f correction = normal * overlap;
 
     ta.pos.x += (correction * (invMassA / totalInvMass)).x;
     ta.pos.y += (correction * (invMassA / totalInvMass)).y;
@@ -86,7 +86,7 @@ void resolveAABB(
     );
 
     Vector2d relativeVelocity = ra.velocity - rb.velocity;
-    double velocityAlongNormal = Vector2d::dot(relativeVelocity, normal);
+    double velocityAlongNormal = Vector2d::dot(relativeVelocity, normal.tod());
 
     if (velocityAlongNormal >= 0.0)
         return;
@@ -98,7 +98,7 @@ void resolveAABB(
         -(1.0 + restitution) * velocityAlongNormal
         / totalInvMass;
 
-    Vector2d impulse = normal * impulseMagnitude;
+    Vector2d impulse = normal.tod() * impulseMagnitude;
 
     ra.velocity += impulse * invMassA;
     rb.velocity -= impulse * invMassB;

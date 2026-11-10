@@ -3,6 +3,6 @@
 #include <mee/utils/vector.hpp>
 
 struct AABBColliderComponent{
-    Vector2d offset = Vector2d::zero();
-    Vector2d halfSize = Vector2d::one() * 100;
+    Vector2f offset = Vector2f::zero();
+    Vector2f halfSize = Vector2f::one() * 100;
 };

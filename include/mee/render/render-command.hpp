@@ -12,6 +12,7 @@ struct TextureCmd{
     Vector2f origin = {0.5f, 0.5f};
     float rotation = 0.0f;
     Color4f tint = Color4f::White();
+    Vector2f tileSize = {1.0f, 1.0f};
 };
 
 struct CircleCmd{

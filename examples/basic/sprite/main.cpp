@@ -11,8 +11,6 @@
 #include "mee/systems/physics/aabb-collision.hpp"
 #include "mee/systems/physics/move.hpp"
 #include "mee/components/tags/camera-target.hpp"
-#include <cstdio>
-#include <filesystem>
 #include <raylib.h>
 
 struct PlayerTagComponent{
@@ -26,15 +24,20 @@ int main(){
     w.init();
 
     Entity player = w.ecs.createEntity(
-        TransformComponent{},
+        TransformComponent{
+            .scale = Vector2f(2.0f, 1.0f)
+        },
         SpriteComponent{
-            .texture = w.res.textureManager.loadTexture("examples/basic/sprite/assets/texture.png")
+            .texture = w.res.textureManager.loadTexture("examples/basic/sprite/assets/texture.png"),
+            .tileSize = Vector2f(1.0f, 1.0f)
         },
         PlayerTagComponent{},
-        RigidbodyComponent{},
+        RigidbodyComponent{
+            .drag = 5.0
+        },
         CameraTargetTag{},
         AABBColliderComponent{
-            .halfSize = Vector2d(64.0, 64.0)
+            .halfSize = Vector2f(135.0f, 157.0f)
         }
     );
     Entity wall = w.ecs.createEntity(
@@ -44,26 +47,37 @@ int main(){
         },
         RigidbodyComponent{},
         AABBColliderComponent{
-            .halfSize = Vector2d(64.0, 64.0)
+            .halfSize = Vector2f(135.0f, 157.0f)
         }
     );
 
     w.pipeline.onDraw(renderSpriteSystem);
     w.pipeline.onUpdate(
-        [](ECS& ecs, EngineResources &res, float dt){
+        [&](ECS& ecs, EngineResources &res, float dt){
             ecs.view<RigidbodyComponent, PlayerTagComponent>(
                 [&](Entity e, RigidbodyComponent& r, auto& tag){
+                    float walkSpeed = 1000.0f;
                     if(res.input.isKeyDown(KEY_A)){
-                        r.velocity.x -= 100.0f * dt;
+                        r.velocity.x -= walkSpeed * dt;
                     }
                     if(res.input.isKeyDown(KEY_D)){
-                        r.velocity.x += 100.0f * dt;
+                        r.velocity.x += walkSpeed * dt;
                     }
                     if(res.input.isKeyDown(KEY_W)){
-                        r.velocity.y -= 100.0f * dt;
+                        r.velocity.y -= walkSpeed * dt;
                     }
                     if(res.input.isKeyDown(KEY_S)){
-                        r.velocity.y += 100.0f * dt;
+                        r.velocity.y += walkSpeed * dt;
+                    }
+                    if(res.input.isKeyDown(KEY_E)){
+                        res.camera.zoom *= 1.05f;
+                    }
+                    if(res.input.isKeyDown(KEY_Q)){
+                        res.camera.zoom /= 1.05f;
+                    }
+                    if(res.input.isKeyPressed(KEY_R)){
+                        SpriteComponent& s = ecs.getComponent<SpriteComponent>(player);
+                        s.tileSize /= 2.0f;
                     }
                 }
             );
