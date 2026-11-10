@@ -1,4 +1,5 @@
 #include "mee/engine-resources/engine-resources.hpp"
+#include <algorithm>
 #include <mee/engine-resources/camera.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/utils/math.hpp>
@@ -54,13 +55,14 @@ void WorldCamera::update(EngineResources& res, float dt){
 
     if(isMoving){
         moveTimer += dt;
-        float t = moveTimer / moveDuration;
-        t = t * t * (3.0f - 2.0f * t);
-        if(t >= 1.0f){
+        float t = std::clamp(moveTimer / moveDuration, 0.0f, 1.0f);
+
+        pos = startPos + (targetPos - startPos) * t;
+
+        if(moveTimer >= moveDuration){
             pos = targetPos;
             isMoving = false;
         }
-        pos = startPos + (targetPos - startPos) * t;
     }
 }
 

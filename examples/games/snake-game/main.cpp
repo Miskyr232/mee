@@ -22,17 +22,27 @@ void moveSnake(std::vector<Vector2i>& snake, Vector2i dir, bool eaten){
     }
 }
 
-int main(){
-    std::filesystem::current_path("examples/basic/assets");
+bool checkLoose(const std::vector<Vector2i>& snake){
+    for(int i = 2; i < snake.size(); i++){
+        if(snake[0] == snake[i]){
+            return true;
+        }
+    }
+    return false;
+}
 
+int main(){
     Engine w;
     w.config.debug.enabled = true;
     w.config.debug.showColliders = true;
+    w.config.window.targetFPS = 60;
+    w.init();
     std::vector<Vector2i> snake(2);
     std::vector<Vector2i> apples(10);
     float snakeSize = 50.0f;
     Vector2i dir;
     float time = 0.0f;
+    float duration = 0.3f;
     bool eaten = false;
 
     w.pipeline.addStartSystem(
@@ -43,7 +53,6 @@ int main(){
             }
         }
     );
-    w.pipeline.onDraw(renderSpriteSystem);
     w.pipeline.onUpdate(
         [&](ECS& ecs, EngineResources &res, float dt){
             for(auto& apple : apples){
@@ -57,35 +66,36 @@ int main(){
     );
     w.pipeline.onUpdate(
         [&](ECS& ecs, EngineResources &res, float dt){
-            if(res.input.isKeyDown(KEY_W)){
+            if(res.input.isKeyDown(KEY_W) && dir.y != 1){
                 dir.y = -1;
                 dir.x = 0;
             }
-            if(res.input.isKeyDown(KEY_S)){
+            else if(res.input.isKeyDown(KEY_S) && dir.y != -1){
                 dir.y = 1;
                 dir.x = 0;
             }
-            if(res.input.isKeyDown(KEY_A)){
+            else if(res.input.isKeyDown(KEY_A) && dir.x != 1){
                 dir.x = -1;
                 dir.y = 0;
             }
-            if(res.input.isKeyDown(KEY_D)){
+            else if(res.input.isKeyDown(KEY_D) && dir.x != -1){
                 dir.x = 1;
                 dir.y = 0;
             }
             time -= dt;
             if(time <= 0.0f){
-                time = 0.2f;
+                time = duration;
                 moveSnake(snake, dir, eaten);
+                if(checkLoose(snake)){
+                    w.exit();
+                }
                 if(eaten){
                     eaten = false;
                 }
+                res.camera.moveTo(Vector2f(snake[0].x * snakeSize, snake[0].y * snakeSize), duration);
             }
-            res.camera.moveTo(Vector2f(snake[0].x * snakeSize, snake[0].y * snakeSize), 0.1f);
         }
     );
-    w.pipeline.onUpdate(moveSystem);
-    w.pipeline.onUpdate(aabbCollideSystem);
     w.pipeline.onDraw(
         [&](ECS& ecs, EngineResources& res){
             for(int i = 0; i < snake.size(); i++){

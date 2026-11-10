@@ -83,11 +83,18 @@ void Engine::renderColliders() {
     );
 }
 
+void Engine::exit(){
+    runing = false;
+}
+
 void Engine::run(){
     pipeline.runStart(ecs, res);
     res.background.texture = res.textureManager.loadTexture("game/assets/space.png");
     res.renderer.init();
     while(!WindowShouldClose()){
+        if(!runing){
+            CloseWindow();
+        }
         res.input.fill();
         pipeline.runUpdate(ecs, res, GetFrameTime());
         res.particleManager.update(GetFrameTime());

@@ -20,16 +20,15 @@ struct PlayerTagComponent{
 };
 
 int main(){
-    std::filesystem::current_path("examples/basic/assets");
-
     Engine w;
     w.config.debug.enabled = true;
     w.config.debug.showColliders = true;
+    w.init();
 
     Entity player = w.ecs.createEntity(
         TransformComponent{},
         SpriteComponent{
-            .texture = w.res.textureManager.loadTexture("texture.png")
+            .texture = w.res.textureManager.loadTexture("examples/basic/sprite/assets/texture.png")
         },
         PlayerTagComponent{},
         RigidbodyComponent{},
@@ -41,7 +40,7 @@ int main(){
     Entity wall = w.ecs.createEntity(
         TransformComponent{},
         SpriteComponent{
-            .texture = w.res.textureManager.loadTexture("texture.png")
+            .texture = w.res.textureManager.loadTexture("examples/basic/sprite/assets/texture.png")
         },
         RigidbodyComponent{},
         AABBColliderComponent{

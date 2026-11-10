@@ -44,6 +44,10 @@ target_sources(mee PRIVATE
 
 target_compile_features(mee PUBLIC cxx_std_20)
 
+target_compile_options(mee PRIVATE
+    $<$<CONFIG:Release>:-O2>
+)
+
 target_include_directories(mee PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
@@ -59,3 +63,54 @@ endif()
 if(MEE_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# Install library
+install(
+    TARGETS mee
+    EXPORT meeTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install headers
+install(
+    DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Export targets
+install(
+    EXPORT meeTargets
+    FILE meeTargets.cmake
+    NAMESPACE mee::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mee
+)
+
+# Generate package config
+configure_package_config_file(
+    cmake/meeConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/meeConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mee
+)
+
+# Generate version file
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/meeConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+# Install config files
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/meeConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/meeConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mee
+)
+

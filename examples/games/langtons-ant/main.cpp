@@ -7,8 +7,10 @@
 #include "mee/systems/render/camera-target.hpp"
 #include "mee/systems/physics/aabb-collision.hpp"
 #include "mee/systems/physics/move.hpp"
+#include <cmath>
 #include <map>
 #include <raylib.h>
+#include <string>
 
 struct Vector2iCmp {
     bool operator()(const Vector2i& a, const Vector2i& b) const {
@@ -32,7 +34,8 @@ int main(){
 
     float cellSize = 30.0f;
     float time = 0.0f;
-    float stepInterval = 2.0f;
+    float stepInterval = 1.0f;
+    float factor = 1;
 
     const Vector2i directions[4] = {
         Vector2i{0, -1}, // UP
@@ -54,7 +57,7 @@ int main(){
     w.pipeline.onUpdate(
         [&](ECS& ecs, EngineResources &res, float dt){
             time -= dt;
-            if(res.input.isKeyDown(KEY_SPACE)){
+            if(time <= 0.0f){
                 time = stepInterval;
 
                 bool isColored = grid.count(antPos) > 0 && grid[antPos] > 0;
@@ -67,21 +70,18 @@ int main(){
                     grid[antPos] = 1;
                 }
                 antPos += directions[antDir];
-                if(res.input.isKeyDown(KEY_D)){
-                    antPos.x += 1;
-                }
-                if(res.input.isKeyDown(KEY_A)){
-                    antPos.x -= 1;
-                }
-                if(res.input.isKeyDown(KEY_W)){
-                    antPos.y -= 1;
-                }
-                if(res.input.isKeyDown(KEY_S)){
-                    antPos.y += 1;
-                }
-                if(res.input.isKeyDown(KEY_Q)){
-                    res.camera.zoom /= 1.01f;
-                }
+            }
+            if(res.input.isKeyDown(KEY_Q)){
+                res.camera.zoom /= 1.05f;
+            }
+            if(res.input.isKeyDown(KEY_E)){
+                res.camera.zoom *= 1.05f;
+            }
+            if(res.input.isKeyPressed(KEY_W) && stepInterval <= 100.0){
+                stepInterval *= 2.0f;
+            }
+            if(res.input.isKeyPressed(KEY_S) && stepInterval >= 0.001){
+                stepInterval /= 2.0f;
             }
 
             res.camera.moveTo(Vector2f(antPos.x * cellSize, antPos.y * cellSize), 0.1f);

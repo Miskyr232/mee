@@ -6,6 +6,7 @@
 #include "mee/core/config/engine-config.hpp"
 
 class Engine{
+    bool runing = true;
 public:
     EngineConfig config;
     ECS ecs;
@@ -17,4 +18,5 @@ public:
 
     void init();
     void renderColliders();
+    void exit();
 };

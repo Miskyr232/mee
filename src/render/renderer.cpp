@@ -109,7 +109,9 @@ void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
             lines.push_back(*lineCmd);
         }else if(auto* textCmd = std::get_if<TextCmd>(&command.variant)){
             flushPending(camera);
-            Vector2f screenPos = camera.worldToScreen(textCmd->position);
+            Vector2f screenPos = textCmd->position;
+            if(!command.isUI)
+                screenPos = camera.worldToScreen(textCmd->position);
             DrawText(
                 textCmd->text.c_str(),
                 screenPos.x,
