@@ -7,6 +7,7 @@
 #include "mee/systems/render/camera-target.hpp"
 #include "mee/systems/physics/aabb-collision.hpp"
 #include "mee/systems/physics/move.hpp"
+#include "mee/utils/profiler.hpp"
 #include <cmath>
 #include <raylib.h>
 #include <string>
@@ -27,7 +28,7 @@ void renderTree(
     int depth,
     float spread
 ){
-    if(depth >= 10) return;
+    if(depth >= 15) return;
 
     float length = 100.0f * std::pow(0.7f, depth);
 
@@ -35,11 +36,11 @@ void renderTree(
     Vector2f right = getLine(pos, angle + spread, length);
 
     res.renderer.renderLine({
-        pos, left, Color4f::Red(), 2.0f
+        pos, left, Color4f::Red(), 0.2f
     });
 
     res.renderer.renderLine({
-        pos, right, Color4f::Red(), 2.0f
+        pos, right, Color4f::Red(), 0.2f
     });
 
     renderTree(res, left, angle - spread, depth + 1, spread);
@@ -56,7 +57,9 @@ int main(){
 
     w.pipeline.onDraw(
         [&](ECS& ecs, EngineResources& res){
-            renderTree(res, Vector2f(100, 100), angle, 0, 0.4);
+            Profiler::instance().profile("generate tree", [&]{
+                renderTree(res, Vector2f(100, 100), angle, 0, 0.4);
+            });
             res.renderer.renderText(
                 {
                     std::to_string(angle),

@@ -10,6 +10,8 @@ option(MEE_BUILD_TESTS "Build mee tests" ON)
 option(MEE_BUILD_EXAMPLES "Build mee examples" ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(raylib REQUIRED)
 
@@ -34,6 +36,7 @@ target_sources(mee PRIVATE
     src/utils/math.cpp
     src/utils/color.cpp
     src/utils/random.cpp
+    src/utils/timer.cpp
 
     src/systems/core/lifetime.cpp
     src/systems/render/render-sprite.cpp

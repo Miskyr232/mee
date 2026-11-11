@@ -4,6 +4,7 @@
 #include <mee/components/physics/aabb-collider.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/engine-resources/engine-resources.hpp>
+#include <mee/utils/profiler.hpp>
 #include <raylib.h>
 
 void Engine::init(){
@@ -19,6 +20,11 @@ void Engine::init(){
         ToggleFullscreen();
 
     colliderTextureID = res.textureManager.loadTexture("assets/collider.png");
+
+    printProfiler.setDuration(1.0f);
+
+    pipeline.runStart(ecs, res);
+    res.renderer.init();
 }
 
 Engine::~Engine(){
@@ -49,30 +55,46 @@ void Engine::exit(){
     runing = false;
 }
 
+void Engine::render(){
+    BeginDrawing();
+    res.renderer.beginFrame();
+
+    ClearBackground(config.window.backgroundColor.toRaylib());
+    pipeline.runDraw(ecs, res);
+    res.particleManager.draw(res);
+
+    if(config.debug.enabled && config.debug.showColliders)
+        renderColliders();
+    res.renderer.flush(res.textureManager, res.camera);
+    if(config.debug.enabled && config.debug.showFPS)
+        DrawFPS(10, 10);
+    EndDrawing();
+}
+
+void Engine::update(float dt){
+    res.input.fill();
+    pipeline.runUpdate(ecs, res, dt);
+    res.particleManager.update(dt);
+    res.camera.update(res, dt);
+}
+
 void Engine::run(){
-    pipeline.runStart(ecs, res);
-    res.renderer.init();
     while(!WindowShouldClose()){
-        if(!runing){
-            CloseWindow();
+        if(!runing)
+            break;
+        float dt = GetFrameTime();
+
+        Profiler::instance().profile("update", [&]{
+            update(dt);
+        });
+
+        Profiler::instance().profile("render", [&]{
+            render();
+        });
+
+        Profiler::instance().update(dt);
+        if(printProfiler.update(dt)){
+            Profiler::instance().printInfo();
         }
-        res.input.fill();
-        pipeline.runUpdate(ecs, res, GetFrameTime());
-        res.particleManager.update(GetFrameTime());
-        res.camera.update(res, GetFrameTime());
-
-        BeginDrawing();
-        res.renderer.beginFrame();
-
-        ClearBackground(config.window.backgroundColor.toRaylib());
-        pipeline.runDraw(ecs, res);
-        res.particleManager.draw(res);
-
-        if(config.debug.enabled && config.debug.showColliders)
-            renderColliders();
-        res.renderer.flush(res.textureManager, res.camera);
-        if(config.debug.enabled && config.debug.showFPS)
-            DrawFPS(10, 10);
-        EndDrawing();
     }
 }
