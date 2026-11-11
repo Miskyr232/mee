@@ -45,7 +45,7 @@ int main(){
     float duration = 0.3f;
     bool eaten = false;
 
-    w.pipeline.addStartSystem(
+    w.pipeline.onStart(
         [&](ECS& ecs, EngineResources& res){
             for(auto& apple : apples){
                 apple.x = res.random.getRandomInt(-10, 10);

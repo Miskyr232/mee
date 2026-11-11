@@ -17,7 +17,7 @@ private:
     std::vector<DrawSystem> drawSystems;
 public:
     void onDraw(DrawSystem system);
-    void addStartSystem(StartSystem system);
+    void onStart(StartSystem system);
     void onUpdate(UpdateSystem system);
 
     void runUpdate(ECS& ecs, EngineResources& res, float dt);

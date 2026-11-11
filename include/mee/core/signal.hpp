@@ -15,6 +15,9 @@ private:
     std::vector<std::pair<ConnectionID, Callback>> callbacks;
 public:
     Signal() = default;
+    Signal(Callback initialCallback){
+        connect(initialCallback);
+    }
     ConnectionID connect(Callback callback){
         ConnectionID id = next_id++;
         callbacks.emplace_back(id, std::move(callback));

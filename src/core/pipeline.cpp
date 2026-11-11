@@ -19,7 +19,7 @@ void Pipeline::runDraw(ECS& ecs, EngineResources& res){
 void Pipeline::onDraw(DrawSystem system){
     drawSystems.push_back(system);
 }
-void Pipeline::addStartSystem(StartSystem system){
+void Pipeline::onStart(StartSystem system){
     startSystems.push_back(system);
 }
 void Pipeline::onUpdate(UpdateSystem system){

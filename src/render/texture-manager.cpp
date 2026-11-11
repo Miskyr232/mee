@@ -2,16 +2,14 @@
 #include <cassert>
 #include <raylib.h>
 
-TextureID TextureManager::loadTexture(const std::string& path){
-    auto it = pathToID.find(path);
-    if(it != pathToID.end()){
-        TextureID id = pathToID[path];
-        return id;
-    }
-    TextureID id = next++;
+TextureID TextureManager::loadTexture(const std::string& path) {
+    if(auto it = pathToID.find(path); it != pathToID.end())
+        return it->second;
+
+    TextureID id = textures.size();
 
     pathToID[path] = id;
-    textures[id] = LoadTexture(path.c_str());
+    textures.push_back(LoadTexture(path.c_str()));
 
     return id;
 }
@@ -21,8 +19,15 @@ const Texture2D& TextureManager::getTexture(TextureID id) const{
 }
 
 TextureManager::~TextureManager(){
-    for(auto& pair : textures){
-        UnloadTexture(pair.second);
+    for(auto& texture : textures){
+        UnloadTexture(texture);
     }
     textures.clear();
+}
+
+TextureMatadata TextureManager::getTextureMetadata(TextureID id) const{
+    Texture2D texture = textures.at(id);
+    return {
+        Vector2i(texture.width, texture.height)
+    };
 }
