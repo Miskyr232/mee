@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <functional>
 #include <string>
 #include <string_view>
@@ -78,17 +79,17 @@ public:
         }
     };
     void printInfo(){
-        std::cout << Text::padRight("", 15);
-        std::cout << Text::padRight("last", 15);
-        std::cout << Text::padRight("average", 15);
-        std::cout << Text::padRight("amount", 15) << std::endl;
+        printf("%s", Text::padRight("", 15).c_str());
+        printf("%s", Text::padRight("last", 15).c_str());
+        printf("%s", Text::padRight("average", 15).c_str());
+        printf("%s\n", Text::padRight("amount", 15).c_str());
         for(auto pair : profiledFuncs){
-            std::cout << Text::repeat("-", 60) << std::endl;
-            std::cout << Text::padRight(pair.first, 15);
-            std::cout << Text::padRight(Text::remove_trailing_zeros(pair.second.last, 3) + " ms", 15);
-            std::cout << Text::padRight(Text::remove_trailing_zeros(pair.second.average, 3) + " ms", 15);
-            std::cout << Text::padRight(std::to_string(pair.second.amount), 15) << std::endl;
+            printf("%s\n", Text::repeat("-", 60).c_str());
+            printf("%s", Text::padRight(pair.first, 15).c_str());
+            printf("%s", (Text::padRight(Text::remove_trailing_zeros(pair.second.last, 3) + " ms", 15)).c_str());
+            printf("%s", (Text::padRight(Text::remove_trailing_zeros(pair.second.average, 3) + " ms", 15)).c_str());
+            printf("%s\n", Text::padRight(std::to_string(pair.second.amount), 15).c_str());
         }
-        std::cout << std::endl;
+        printf("\n");
     }
 };

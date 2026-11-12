@@ -87,7 +87,7 @@ int main(){
         [](ECS& ecs, EngineResources& res){
             ecs.view<HealthComponent, TransformComponent, SpriteComponent>(
                 [&](Entity e, HealthComponent& hl, TransformComponent& tr, SpriteComponent& sp){
-                    TextureMatadata textureMetadata = res.textureManager.getTextureMetadata(sp.texture);
+                    TextureMetadata textureMetadata = res.textureManager.getTextureMetadata(sp.texture);
                     res.renderer.renderText(
                         {
                             std::to_string(hl.health),

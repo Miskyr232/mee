@@ -25,7 +25,7 @@ TextureManager::~TextureManager(){
     textures.clear();
 }
 
-TextureMatadata TextureManager::getTextureMetadata(TextureID id) const{
+TextureMetadata TextureManager::getTextureMetadata(TextureID id) const{
     Texture2D texture = textures.at(id);
     return {
         Vector2i(texture.width, texture.height)

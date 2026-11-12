@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <mee/render/texture-manager.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/utils/color.hpp>
@@ -36,7 +37,7 @@ struct TextCmd{
 };
 
 struct RectCmd{
-    Vector2f positon;
+    Vector2f position;
     Vector2f size;
     Color4f color;
 };
@@ -48,8 +49,12 @@ struct LineCmd{
     float thickness = 2.0f;
 };
 
-struct RenderCmd{
-    float zIndex = 0.0f;
-    bool isUI = false;
-    std::variant<TextureCmd, CircleCmd, TextCmd, RingCmd, RectCmd, LineCmd> variant;
+enum class CmdType : uint16_t { Texture, Circle, Ring, Text, Rect, Line};
+
+struct SortKey{
+    float    z;
+    uint32_t seq;
+    CmdType  type;
+    uint32_t index;
+    bool     isUI;
 };

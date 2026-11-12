@@ -24,6 +24,7 @@ int main(){
     w.config.debug.enabled = true;
     w.config.debug.showColliders = false;
     w.config.window.resizable = true;
+    w.config.window.targetFPS = 60;
     w.config.window.fullscreen = true;
     w.init();
 

@@ -8,7 +8,7 @@
 
 using TextureID = size_t;
 
-struct TextureMatadata{
+struct TextureMetadata{
     Vector2i size;
 };
 
@@ -20,6 +20,6 @@ class TextureManager{
     public:
     TextureID loadTexture(const std::string& path);
     const Texture2D& getTexture(TextureID id) const;
-    TextureMatadata getTextureMetadata(TextureID id) const;
+    TextureMetadata getTextureMetadata(TextureID id) const;
     ~TextureManager();
 };

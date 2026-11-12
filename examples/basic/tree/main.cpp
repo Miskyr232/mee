@@ -2,6 +2,7 @@
 #include "mee/core/engine.hpp"
 #include "mee/systems/render/render-sprite.hpp"
 #include "mee/utils/color.hpp"
+#include "mee/utils/timer.hpp"
 #include "mee/utils/vector.hpp"
 #include "mee/engine-resources/engine-resources.hpp"
 #include "mee/systems/render/camera-target.hpp"
@@ -9,6 +10,7 @@
 #include "mee/systems/physics/move.hpp"
 #include "mee/utils/profiler.hpp"
 #include <cmath>
+#include <cstdio>
 #include <raylib.h>
 #include <string>
 #include <vector>
@@ -49,10 +51,10 @@ void renderTree(
     int sh = GetScreenHeight();
 
     lines.push_back({
-        pos, left, color, 0.4f
+        pos, left, color, 0.1f
     });
     lines.push_back({
-        pos, right, color, 0.4f
+        pos, right, color, 0.1f
     });
 
     renderTree(res, left, angle - spread, depth + leftK, spread);
@@ -82,6 +84,9 @@ int main(){
 
     float angle = -3.14 / 2.0f;
     float spread = 0.4;
+
+
+    Timer t(1.0f);
 
     w.pipeline.onStart(
         [&](ECS& ecs, EngineResources& res){
@@ -140,6 +145,9 @@ int main(){
             if(res.input.isKeyDown(KEY_X)){
                 spread -= 0.01f * dt / 0.016f;
                 updateTree(res, Vector2f(100, 100), angle, 1, spread);
+            }
+            if(t.update(dt)){
+                std::cout << lines.size() << std::endl;
             }
         }
     );

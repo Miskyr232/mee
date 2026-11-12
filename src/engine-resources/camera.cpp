@@ -4,13 +4,22 @@
 #include <mee/utils/vector.hpp>
 #include <mee/utils/math.hpp>
 
-Vector2f WorldCamera::worldToScreen(Vector2f world){
-    Vector2f relative = world - pos - shakePos;
-    double cosA = cos(-(degToRadf(rotation)));
-    double sinA = sin(-(degToRadf(rotation)));
+void WorldCamera::updateRotationCache(){
+    if(rotation == cachedRotation)
+        return;
+    double angle = -(degToRadf(rotation));
+    cachedCos = cos(angle);
+    cachedSin = sin(angle);
+    cachedRotation = rotation;
+}
 
-    double rotatedX = relative.x * cosA - relative.y * sinA;
-    double rotatedY = relative.x * sinA + relative.y * cosA;
+Vector2f WorldCamera::worldToScreen(Vector2f world){
+    updateRotationCache();
+
+    Vector2f relative = world - pos - shakePos;
+
+    double rotatedX = relative.x * cachedCos - relative.y * cachedSin;
+    double rotatedY = relative.x * cachedSin + relative.y * cachedCos;
 
     return {
         static_cast<float>(rotatedX * zoom + GetScreenWidth() * 0.5),
@@ -19,16 +28,16 @@ Vector2f WorldCamera::worldToScreen(Vector2f world){
 }
 
 Vector2f WorldCamera::screenToWorld(Vector2f screen){
+    updateRotationCache();
+
     Vector2f relative = {
         (screen.x - GetScreenWidth() * 0.5f) / zoom,
         (screen.y - GetScreenHeight() * 0.5f) / zoom
     };
 
-    double cosA = cos(degToRadf(rotation));
-    double sinA = sin(degToRadf(rotation));
-
-    double rotatedX = relative.x * cosA - relative.y * sinA;
-    double rotatedY = relative.x * sinA + relative.y * cosA;
+    // inverse rotation: cos stays the same, sin flips sign
+    double rotatedX = relative.x * cachedCos + relative.y * cachedSin;
+    double rotatedY = -relative.x * cachedSin + relative.y * cachedCos;
 
     return {
         static_cast<float>(rotatedX + pos.x + shakePos.x),

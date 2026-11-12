@@ -7,21 +7,37 @@
 #include <mee/engine-resources/camera.hpp>
 
 class Renderer{
-    std::vector<RenderCmd> commands;
+    std::vector<SortKey> order;
+
+    std::vector<CircleCmd> circleCmds;
+    std::vector<RectCmd> rectCmds;
+    std::vector<RingCmd> ringCmds;
+    std::vector<LineCmd> lineCmds;
+    std::vector<TextCmd> textCmds;
+    std::vector<TextureCmd> textureCmds;
+    int nextSeq = 0;
+
+    float firstZIndex = 0.0f;
+    bool uniformZIndex = true;
+
     std::vector<CircleCmd> circles;
     std::vector<RectCmd> rects;
     std::vector<RingCmd> rings;
     std::vector<LineCmd> lines;
+
     Shader circleShader;
     Shader rectShader;
     Shader ringShader;
     Shader tileShader;
     int ringInRadiusLoc;
     int tileSizeLoc;
+    // GL texture wrap is per-texture persistent state; track the last texture
+    // we switched to REPEAT to avoid a GL state change on every tiled draw.
+    unsigned int lastWrapTextureId = 0;
+    bool hasWrapTexture = false;
 public:
     void init();
     void beginFrame();
-    void render(RenderCmd smd);
     void renderTexture(TextureCmd cmd, float zIndex = 0, bool isUI = false);
     void renderCircle(CircleCmd cmd, float zIndex = 0, bool isUI = false);
     void renderText(TextCmd cmd, float zIndex = 0, bool isUI = false);

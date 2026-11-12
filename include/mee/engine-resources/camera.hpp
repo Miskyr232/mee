@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mee/utils/vector.hpp>
+#include <limits>
 #include <raylib.h>
 
 class EngineResources;
@@ -13,6 +14,12 @@ class WorldCamera{
     float moveDuration = 0.0f;
     float moveTimer = 0.0f;
     bool isMoving = false;
+
+    double cachedCos = 1.0;
+    double cachedSin = 0.0;
+    float cachedRotation = std::numeric_limits<float>::quiet_NaN();
+
+    void updateRotationCache();
 
     public:
     Vector2f pos = Vector2f::zero();

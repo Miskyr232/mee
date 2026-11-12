@@ -37,7 +37,8 @@ Engine::~Engine(){
 void Engine::renderColliders() {
     ecs.view<AABBColliderComponent, TransformComponent>(
         [&](Entity e, AABBColliderComponent& aabb, TransformComponent& transform) {
-            Vector2f size = getAABB(transform, aabb).max - getAABB(transform, aabb).min;
+            AABB box = getAABB(transform, aabb);
+            Vector2f size = box.max - box.min;
             res.renderer.renderRect(
                 {
                     transform.pos - size / 2.0f,
@@ -94,7 +95,7 @@ void Engine::run(){
             render();
         });
 
-        Profiler::instance().measure("end render", [&]{
+        Profiler::instance().measure("wait fps", [&]{
             endRender();
         });
 

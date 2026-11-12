@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <mee/render/renderer.hpp>
 #include <mee/render/render-command.hpp>
 #include <mee/render/texture-manager.hpp>
@@ -5,6 +6,7 @@
 #include <mee/utils/profiler.hpp>
 #include <mee/engine-resources/camera.hpp>
 #include <cstdio>
+#include <numeric>
 #include <raylib.h>
 #include <rlgl.h>
 #include <variant>
@@ -70,140 +72,149 @@ void Renderer::init(){
     tileShader = LoadShaderFromMemory(NULL, tileFs);
     tileSizeLoc = GetShaderLocation(tileShader, "tileSize");
     ringInRadiusLoc = GetShaderLocation(ringShader, "inRadius");
+
+    circles.reserve(256);
+    rects.reserve(256);
+    rings.reserve(64);
+    lines.reserve(256);
 }
 
 void Renderer::beginFrame(){
-    commands.clear();
-}
+    order.clear();
 
-void Renderer::render(RenderCmd cmd){
-    commands.push_back(std::move(cmd));
+    textCmds.clear();
+    textureCmds.clear();
+    lineCmds.clear();
+    circleCmds.clear();
+    ringCmds.clear();
+    rectCmds.clear();
+
+    nextSeq = 0;
+    uniformZIndex = true;
 }
 
 void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
     Profiler::instance().measure(
-        "sort",
+        "sort render cmd",
         [&](){
-            std::stable_sort(commands.begin(), commands.end(),
-                 [](const RenderCmd& a, const RenderCmd& b){
-                    return a.zIndex < b.zIndex;
-                 });
+            if(!uniformZIndex){
+                std::sort(order.begin(), order.end(), [](const SortKey& a, const SortKey& b){
+                    if(a.z != b.z) return a.z < b.z;
+                    return a.seq < b.seq;
+                });
+            }
         }
     );
     circles.clear();
     rects.clear();
     rings.clear();
     lines.clear();
-    for(const auto& command : commands){
-        if(auto* circleCmd = std::get_if<CircleCmd>(&command.variant)){
-            if(!rects.empty()){
+    for(const SortKey& k : order){
+        switch (k.type) {
+            case CmdType::Texture:{
                 flushPending(camera);
-            }if(!rings.empty()){
-                flushPending(camera);
-            }if(!lines.empty()){
-                flushPending(camera);
+
+                Texture2D texture = textureManager.getTexture(textureCmds[k.index].texture);
+
+                Vector2f screenPos = camera.worldToScreen(textureCmds[k.index].pos);
+
+                float zoom = camera.zoom;
+
+                Rectangle source = {
+                    0, 0,
+                    (float)texture.width,
+                    (float)texture.height
+                };
+
+                Rectangle dest = {
+                    screenPos.x,
+                    screenPos.y,
+                    texture.width * zoom * textureCmds[k.index].scale.x,
+                    texture.height * zoom * textureCmds[k.index].scale.y
+                };
+
+                Vector2 origin = {
+                    texture.width * zoom * textureCmds[k.index].scale.x * textureCmds[k.index].origin.x,
+                    texture.height * zoom * textureCmds[k.index].scale.y * textureCmds[k.index].origin.y
+                };
+                if(textureCmds[k.index].tileSize.x != 1.0f ||
+                   textureCmds[k.index].tileSize.y != 1.0f){
+
+                    if(!hasWrapTexture || lastWrapTextureId != texture.id){
+                        SetTextureWrap(texture, TEXTURE_WRAP_REPEAT);
+                        lastWrapTextureId = texture.id;
+                        hasWrapTexture = true;
+                    }
+
+                    BeginShaderMode(tileShader);
+
+                    SetShaderValue(
+                        tileShader,
+                        tileSizeLoc,
+                        &textureCmds[k.index].tileSize,
+                        SHADER_UNIFORM_VEC2
+                    );
+
+                    DrawTexturePro(
+                        texture,
+                        source,
+                        dest,
+                        origin,
+                        textureCmds[k.index].rotation - camera.rotation,
+                        textureCmds[k.index].tint.toRaylib()
+                    );
+
+                    EndShaderMode();
+
+                }else{
+                    DrawTexturePro(
+                        texture,
+                        source,
+                        dest,
+                        origin,
+                        textureCmds[k.index].rotation - camera.rotation,
+                        textureCmds[k.index].tint.toRaylib()
+                    );
+                }
+                break;
             }
-            circles.push_back(*circleCmd);
-        }else if(auto* rectCmd = std::get_if<RectCmd>(&command.variant)){
-            if(!circles.empty()){
+            case CmdType::Text:{
                 flushPending(camera);
-            }if(!rings.empty()){
-                flushPending(camera);
-            }if(!lines.empty()){
-                flushPending(camera);
-            }
-            rects.push_back(*rectCmd);
-        }else if(auto* ringCmd = std::get_if<RingCmd>(&command.variant)){
-            if(!circles.empty()){
-                flushPending(camera);
-            }if(!rects.empty()){
-                flushPending(camera);
-            }if(!lines.empty()){
-                flushPending(camera);
-            }
-            rings.push_back(*ringCmd);
-        }else if(auto* lineCmd = std::get_if<LineCmd>(&command.variant)){
-            if(!circles.empty()){
-                flushPending(camera);
-            }if(!rects.empty()){
-                flushPending(camera);
-            }if(!rings.empty()){
-                flushPending(camera);
-            }
-            lines.push_back(*lineCmd);
-        }else if(auto* textCmd = std::get_if<TextCmd>(&command.variant)){
-            flushPending(camera);
-            Vector2f screenPos = textCmd->position;
-            if(!command.isUI)
-                screenPos = camera.worldToScreen(textCmd->position);
-            DrawText(
-                textCmd->text.c_str(),
-                screenPos.x,
-                screenPos.y,
-                textCmd->fontSize * camera.zoom,
-                textCmd->color.toRaylib()
-            );
-        }else if(auto* textureCmd = std::get_if<TextureCmd>(&command.variant)){
-            flushPending(camera);
-
-            Texture2D texture = textureManager.getTexture(textureCmd->texture);
-
-            Vector2f screenPos = camera.worldToScreen(textureCmd->pos);
-
-            float zoom = camera.zoom;
-
-            Rectangle source = {
-                0, 0,
-                (float)texture.width,
-                (float)texture.height
-            };
-
-            Rectangle dest = {
-                screenPos.x,
-                screenPos.y,
-                texture.width * zoom * textureCmd->scale.x,
-                texture.height * zoom * textureCmd->scale.y
-            };
-
-            Vector2 origin = {
-                texture.width * zoom * textureCmd->scale.x * textureCmd->origin.x,
-                texture.height * zoom * textureCmd->scale.y * textureCmd->origin.y
-            };
-
-            if(textureCmd->tileSize.x != 1.0f ||
-               textureCmd->tileSize.y != 1.0f){
-
-                SetTextureWrap(texture, TEXTURE_WRAP_REPEAT);
-
-                BeginShaderMode(tileShader);
-
-                SetShaderValue(
-                    tileShader,
-                    tileSizeLoc,
-                    &textureCmd->tileSize,
-                    SHADER_UNIFORM_VEC2
+                Vector2f screenPos = textCmds[k.index].position;
+                if(!k.isUI)
+                    screenPos = camera.worldToScreen(textCmds[k.index].position);
+                DrawText(
+                    textCmds[k.index].text.c_str(),
+                    screenPos.x,
+                    screenPos.y,
+                    textCmds[k.index].fontSize * camera.zoom,
+                    textCmds[k.index].color.toRaylib()
                 );
-
-                DrawTexturePro(
-                    texture,
-                    source,
-                    dest,
-                    origin,
-                    textureCmd->rotation - camera.rotation,
-                    textureCmd->tint.toRaylib()
-                );
-
-                EndShaderMode();
-
-            }else{
-                DrawTexturePro(
-                    texture,
-                    source,
-                    dest,
-                    origin,
-                    textureCmd->rotation - camera.rotation,
-                    textureCmd->tint.toRaylib()
-                );
+                break;
+            }
+            case CmdType::Rect:{
+                if(!circles.empty() || !rings.empty() || !lines.empty())
+                    flushPending(camera);
+                rects.push_back(rectCmds[k.index]);
+                break;
+            }
+            case CmdType::Circle:{
+                if(!rects.empty() || !rings.empty() || !lines.empty())
+                    flushPending(camera);
+                circles.push_back(circleCmds[k.index]);
+                break;
+            }
+            case CmdType::Ring:{
+                if(!rects.empty() || !circles.empty() || !lines.empty())
+                    flushPending(camera);
+                rings.push_back(ringCmds[k.index]);
+                break;
+            }
+            case CmdType::Line:{
+                if(!rects.empty() || !circles.empty() || !rings.empty())
+                    flushPending(camera);
+                lines.push_back(lineCmds[k.index]);
+                break;
             }
         }
     }
@@ -214,46 +225,58 @@ void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
 }
 
 void Renderer::renderTexture(TextureCmd cmd, float zIndex, bool isUI){
-    render({
-        zIndex,
-        isUI,
-        cmd
-    });
+    if(order.empty()){
+        firstZIndex = zIndex;
+    }else if(zIndex != firstZIndex){
+        uniformZIndex = false;
+    }
+    textureCmds.push_back(cmd);
+    order.push_back({zIndex, (uint32_t)nextSeq++, CmdType::Texture, (uint32_t)textureCmds.size() - 1, isUI});
 }
 void Renderer::renderText(TextCmd cmd, float zIndex, bool isUI){
-    render({
-        zIndex,
-        isUI,
-        cmd
-    });
+    if(order.empty()){
+        firstZIndex = zIndex;
+    }else if(zIndex != firstZIndex){
+        uniformZIndex = false;
+    }
+    textCmds.push_back(cmd);
+    order.push_back({zIndex, (uint32_t)nextSeq++, CmdType::Text, (uint32_t)textCmds.size() - 1, isUI});
 }
 void Renderer::renderCircle(CircleCmd cmd, float zIndex, bool isUI){
-    render({
-        zIndex,
-        isUI,
-        cmd
-    });
+    if(order.empty()){
+        firstZIndex = zIndex;
+    }else if(zIndex != firstZIndex){
+        uniformZIndex = false;
+    }
+    circleCmds.push_back(cmd);
+    order.push_back({zIndex, (uint32_t)nextSeq++, CmdType::Circle, (uint32_t)circleCmds.size() - 1, isUI});
 }
 void Renderer::renderRing(RingCmd cmd, float zIndex, bool isUI){
-    render({
-        zIndex,
-        isUI,
-        cmd
-    });
+    if(order.empty()){
+        firstZIndex = zIndex;
+    }else if(zIndex != firstZIndex){
+        uniformZIndex = false;
+    }
+    ringCmds.push_back(cmd);
+    order.push_back({zIndex, (uint32_t)nextSeq++, CmdType::Ring, (uint32_t)ringCmds.size() - 1, isUI});
 }
 void Renderer::renderRect(RectCmd cmd, float zIndex, bool isUI){
-    render({
-        zIndex,
-        isUI,
-        cmd
-    });
+    if(order.empty()){
+        firstZIndex = zIndex;
+    }else if(zIndex != firstZIndex){
+        uniformZIndex = false;
+    }
+    rectCmds.push_back(cmd);
+    order.push_back({zIndex, (uint32_t)nextSeq++, CmdType::Rect, (uint32_t)rectCmds.size() - 1, isUI});
 }
 void Renderer::renderLine(LineCmd cmd, float zIndex, bool isUI){
-    render({
-        zIndex,
-        isUI,
-        cmd
-    });
+    if(order.empty()){
+        firstZIndex = zIndex;
+    }else if(zIndex != firstZIndex){
+        uniformZIndex = false;
+    }
+    lineCmds.push_back(cmd);
+    order.push_back({zIndex, (uint32_t)nextSeq++, CmdType::Line, (uint32_t)lineCmds.size() - 1, isUI});
 }
 void Renderer::flushCircles(const std::vector<CircleCmd>& circles, WorldCamera& camera){
     if(circles.empty()) return;
@@ -300,11 +323,11 @@ void Renderer::flushRects(const std::vector<RectCmd>& rects, WorldCamera& camera
     rlBegin(RL_QUADS);
 
     for(const auto& r : rects){
-        Vector2f p = camera.worldToScreen(r.positon);
+        Vector2f p = camera.worldToScreen(r.position);
         float w = r.size.x * camera.zoom;
         float h = r.size.y * camera.zoom;
 
-        if(p.x + w < 0 || p.x - w > sw || p.y + h < 0 || p.y - h > sh) continue;
+        if(p.x > sw || p.x + w < 0 || p.y > sh || p.y + h < 0) continue;
 
         rlCheckRenderBatchLimit(4);
         Color col = r.color.toRaylib();
