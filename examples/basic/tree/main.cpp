@@ -25,7 +25,7 @@ struct PlayerTagComponent{
 };
 
 Vector2f getLine(Vector2f start, float angle, float length){
-    Vector2f dir(std::cosf(angle), std::sinf(angle));
+    Vector2f dir(std::cos(angle), std::sin(angle));
     return start + dir * length;
 }
 

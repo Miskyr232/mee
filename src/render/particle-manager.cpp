@@ -87,8 +87,8 @@ void ParticleManager::emit(EmitterHandle handle, EngineResources& res) {
         color.b = (unsigned char)std::clamp(color.b + (color.b * b_offset), 0.0f, 255.0f);
 
         Vector2f vel = {
-            cosf(angle) * settings.speed * speedMul,
-            sinf(angle) * settings.speed * speedMul
+            cos(angle) * settings.speed * speedMul,
+            sin(angle) * settings.speed * speedMul
         };
 
         particles.push_back({
