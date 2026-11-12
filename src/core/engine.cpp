@@ -1,10 +1,11 @@
 #include "mee/utils/color.hpp"
-#include <mee/core/world.hpp>
+#include <mee/core/engine.hpp>
 #include <mee/components/core/transform.hpp>
 #include <mee/components/physics/aabb-collider.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/engine-resources/engine-resources.hpp>
 #include <mee/utils/profiler.hpp>
+#include <mee/systems/physics/aabb-collision.hpp>
 #include <raylib.h>
 
 void Engine::init(){
@@ -36,23 +37,21 @@ Engine::~Engine(){
 void Engine::renderColliders() {
     ecs.view<AABBColliderComponent, TransformComponent>(
         [&](Entity e, AABBColliderComponent& aabb, TransformComponent& transform) {
-            res.renderer.renderTexture(
+            Vector2f size = getAABB(transform, aabb).max - getAABB(transform, aabb).min;
+            res.renderer.renderRect(
                 {
-                    colliderTextureID,
-                    transform.pos,
-                    aabb.halfSize / 128.0f * transform.scale * 2.0f,
-                    Vector2f(0.5f, 0.5f),
-                    0.0f,
-                    Color4f(1.0f, 1.0f, 1.0f, 0.2f)
+                    transform.pos - size / 2.0f,
+                    size,
+                    Color4f(0.8f, 0.0f, 0.0f, 0.5f)
                 },
-                100
+                10000
             );
         }
     );
 }
 
 void Engine::exit(){
-    runing = false;
+    running = false;
 }
 
 void Engine::render(){
@@ -68,6 +67,9 @@ void Engine::render(){
     res.renderer.flush(res.textureManager, res.camera);
     if(config.debug.enabled && config.debug.showFPS)
         DrawFPS(10, 10);
+}
+
+void Engine::endRender(){
     EndDrawing();
 }
 
@@ -80,21 +82,25 @@ void Engine::update(float dt){
 
 void Engine::run(){
     while(!WindowShouldClose()){
-        if(!runing)
+        if(!running)
             break;
         float dt = GetFrameTime();
 
-        Profiler::instance().profile("update", [&]{
+        Profiler::instance().measure("update", [&]{
             update(dt);
         });
 
-        Profiler::instance().profile("render", [&]{
+        Profiler::instance().measure("render", [&]{
             render();
         });
 
+        Profiler::instance().measure("end render", [&]{
+            endRender();
+        });
+
         Profiler::instance().update(dt);
-        if(printProfiler.update(dt)){
-            Profiler::instance().printInfo();
-        }
+        // if(printProfiler.update(dt)){
+        //     Profiler::instance().printInfo();
+        // }
     }
 }

@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/mee-tree.dir/link.d "CMakeFiles/mee-tree.dir/main.cpp.o" -o mee-tree  ../../../libmee.a /usr/lib/libraylib.so.6.2.0 -lm

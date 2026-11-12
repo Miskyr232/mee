@@ -4,7 +4,7 @@
 #include "mee/components/render/sprite.hpp"
 #include "mee/core/signal.hpp"
 #include "mee/ecs/ecs.hpp"
-#include "mee/core/world.hpp"
+#include "mee/core/engine.hpp"
 #include "mee/render/texture-manager.hpp"
 #include "mee/systems/render/render-sprite.hpp"
 #include "mee/utils/color.hpp"

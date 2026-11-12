@@ -1,5 +1,5 @@
 #include "mee/ecs/ecs.hpp"
-#include "mee/core/world.hpp"
+#include "mee/core/engine.hpp"
 #include "mee/systems/render/render-sprite.hpp"
 #include "mee/utils/color.hpp"
 #include "mee/utils/vector.hpp"

@@ -43,42 +43,42 @@ class Storage : public StorageBase{
 public:
     std::vector<T> dense;
     std::vector<Entity> owners;
-    std::vector<std::size_t> sparce;
+    std::vector<std::size_t> sparse;
 
     void add(Entity e, T value){
         if(has(e)){
-            dense[sparce[e.index]] = std::move(value);
+            dense[sparse[e.index]] = std::move(value);
             return;
         }
-        if(e.index >= sparce.size()){
-            sparce.resize(static_cast<std::size_t>(e.index + 1), nopos);
+        if(e.index >= sparse.size()){
+            sparse.resize(static_cast<std::size_t>(e.index + 1), nopos);
         }
-        sparce[e.index] = dense.size();
+        sparse[e.index] = dense.size();
         dense.push_back(std::move(value));
         owners.push_back(e);
     }
     bool has(Entity e) const{
-        return e.index < sparce.size()
-            && sparce[e.index] != nopos
-            && owners[sparce[e.index]] == e;
+        return e.index < sparse.size()
+            && sparse[e.index] != nopos
+            && owners[sparse[e.index]] == e;
     }
     T& get(Entity e){
         assert(has(e));
-        return dense[sparce[e.index]];
+        return dense[sparse[e.index]];
     }
     void erase(Entity e) override{
         if(!has(e))
             return;
-        auto pos = sparce[e.index];
+        auto pos = sparse[e.index];
         auto last = dense.size() - 1;
         if(pos != last){
             dense[pos] = std::move(dense[last]);
             owners[pos] = owners[last];
-            sparce[owners[pos].index] = pos;
+            sparse[owners[pos].index] = pos;
         }
         dense.pop_back();
         owners.pop_back();
-        sparce[e.index] = nopos;
+        sparse[e.index] = nopos;
     }
     std::size_t size() const override{
         return dense.size();

@@ -2,8 +2,8 @@
 #include <mee/render/render-command.hpp>
 #include <mee/render/texture-manager.hpp>
 #include <mee/utils/vector.hpp>
+#include <mee/utils/profiler.hpp>
 #include <mee/engine-resources/camera.hpp>
-#include <algorithm>
 #include <cstdio>
 #include <raylib.h>
 #include <rlgl.h>
@@ -81,10 +81,15 @@ void Renderer::render(RenderCmd cmd){
 }
 
 void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
-    std::stable_sort(commands.begin(), commands.end(),
-                     [](const RenderCmd& a, const RenderCmd& b){
-                        return a.zIndex < b.zIndex;
-                     });
+    Profiler::instance().measure(
+        "sort",
+        [&](){
+            std::stable_sort(commands.begin(), commands.end(),
+                 [](const RenderCmd& a, const RenderCmd& b){
+                    return a.zIndex < b.zIndex;
+                 });
+        }
+    );
     circles.clear();
     rects.clear();
     rings.clear();
@@ -356,6 +361,9 @@ void Renderer::flushRings(const std::vector<RingCmd>& rings, WorldCamera& camera
 void Renderer::flushLines(const std::vector<LineCmd>& lines, WorldCamera& camera){
     if(lines.empty()) return;
 
+    const float sw = (float)GetScreenWidth();
+    const float sh = (float)GetScreenHeight();
+
     rlDrawRenderBatchActive();
     rlSetTexture(0);
     rlDisableBackfaceCulling();
@@ -367,6 +375,10 @@ void Renderer::flushLines(const std::vector<LineCmd>& lines, WorldCamera& camera
 
         Vector2f start = camera.worldToScreen(line.start);
         Vector2f end = camera.worldToScreen(line.end);
+
+        if((start.x > sw && end.x > sw || start.y > sh && end.y > sh ) || (start.x < 0.0f && end.x < 0.0f || start.y < 0.0f && end.y < 0.0f)){
+            continue;
+        }
 
         float dx = end.x - start.x;
         float dy = end.y - start.y;

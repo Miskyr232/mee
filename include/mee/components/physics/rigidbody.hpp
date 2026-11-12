@@ -29,7 +29,7 @@ struct RigidbodyComponent{
     //     invMass = (mass > 0.0f) ? (1.0f / mass) : 0.0f;
     //     invInertiaTensor = (inertiaTensor > 0.0f) ? (1.0f / inertiaTensor) : 0.0f;
     // }
-    void applyForce(Vector2d force){
-        forceAccumulator += force;
-    }
+    // void applyForce(Vector2d force){
+    //     forceAccumulator += force;
+    // }
 };

@@ -8,7 +8,7 @@
 #include "mee/utils/timer.hpp"
 
 class Engine{
-    bool runing = true;
+    bool running = true;
     TextureID colliderTextureID;
     void render();
     void update(float dt);
@@ -21,6 +21,7 @@ public:
 
     ~Engine();
     void run();
+    void endRender();
 
     void init();
     void renderColliders();

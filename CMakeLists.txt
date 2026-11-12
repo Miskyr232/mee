@@ -21,7 +21,7 @@ add_library(mee::mee ALIAS mee)
 
 target_sources(mee PRIVATE
     src/ecs/ecs.cpp
-    src/core/world.cpp
+    src/core/engine.cpp
     src/core/pipeline.cpp
 
     src/render/particle-manager.cpp
@@ -37,6 +37,7 @@ target_sources(mee PRIVATE
     src/utils/color.cpp
     src/utils/random.cpp
     src/utils/timer.cpp
+    src/utils/text.cpp
 
     src/systems/core/lifetime.cpp
     src/systems/render/render-sprite.cpp

@@ -5,19 +5,6 @@
 #include <mee/utils/vector.hpp>
 #include <vector>
 
-struct AABB {
-    Vector2f min;
-    Vector2f max;
-};
-
-struct CollisionObject {
-    Entity entity;
-
-    TransformComponent* transform;
-    AABBColliderComponent* collider;
-    RigidbodyComponent* rigidbody;
-};
-
 AABB getAABB(
     const TransformComponent& t,
     const AABBColliderComponent& c

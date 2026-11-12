@@ -1,5 +1,5 @@
 #include "mee/ecs/ecs.hpp"
-#include "mee/core/world.hpp"
+#include "mee/core/engine.hpp"
 #include "mee/systems/render/render-sprite.hpp"
 #include "mee/utils/color.hpp"
 #include "mee/utils/vector.hpp"
@@ -7,7 +7,6 @@
 #include "mee/systems/render/camera-target.hpp"
 #include "mee/systems/physics/aabb-collision.hpp"
 #include "mee/systems/physics/move.hpp"
-#include <filesystem>
 #include <raylib.h>
 #include <vector>
 
@@ -23,7 +22,7 @@ void moveSnake(std::vector<Vector2i>& snake, Vector2i dir, bool eaten){
 }
 
 bool checkLoose(const std::vector<Vector2i>& snake){
-    for(int i = 2; i < snake.size(); i++){
+    for(int i = 1; i < snake.size(); i++){
         if(snake[0] == snake[i]){
             return true;
         }
@@ -37,10 +36,10 @@ int main(){
     w.config.debug.showColliders = true;
     w.config.window.targetFPS = 60;
     w.init();
-    std::vector<Vector2i> snake(2);
+    std::vector<Vector2i> snake = {{0, 0}, {0, 1}, {0, 2}};
     std::vector<Vector2i> apples(10);
     float snakeSize = 50.0f;
-    Vector2i dir;
+    Vector2i dir = {0, -1};
     float time = 0.0f;
     float duration = 0.3f;
     bool eaten = false;

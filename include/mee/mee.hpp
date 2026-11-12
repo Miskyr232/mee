@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mee/core/world.hpp>
+#include <mee/core/engine.hpp>
 #include <mee/core/pipeline.hpp>
 
 #include <mee/ecs/ecs.hpp>

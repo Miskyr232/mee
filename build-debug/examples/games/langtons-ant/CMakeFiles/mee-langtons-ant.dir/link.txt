@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/mee-langtons-ant.dir/link.d "CMakeFiles/mee-langtons-ant.dir/main.cpp.o" -o mee-langtons-ant  ../../../libmee.a /usr/lib/libraylib.so.6.2.0 -lm
