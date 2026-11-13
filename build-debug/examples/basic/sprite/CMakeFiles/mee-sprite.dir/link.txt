@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/mee-sprite.dir/link.d "CMakeFiles/mee-sprite.dir/main.cpp.o" -o mee-sprite  ../../../libmee.a /usr/lib/libraylib.so.6.2.0 -lm

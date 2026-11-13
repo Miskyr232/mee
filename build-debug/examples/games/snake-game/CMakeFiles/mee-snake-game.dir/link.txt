@@ -1,1 +1,0 @@
-/usr/bin/c++ -g -Wl,--dependency-file=CMakeFiles/mee-snake-game.dir/link.d "CMakeFiles/mee-snake-game.dir/main.cpp.o" -o mee-snake-game  ../../../libmee.a /usr/lib/libraylib.so.6.2.0 -lm
