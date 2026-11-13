@@ -90,7 +90,8 @@ public:
 
 class ECS{
     std::vector<Slot> slots;
-    std::vector<Entity> iterBuf;
+    std::vector<std::vector<Entity>> iterBufs;
+    int viewDepth = 0;
     std::vector<uint32_t> freeList;
 
     std::unordered_map<std::type_index, std::unique_ptr<StorageBase>> storages;
@@ -149,8 +150,12 @@ class ECS{
         for (std::size_t k = 1; k < sizeof...(Components); ++k)
             if (sets[k]->size() < sets[min]->size()) min = k;
 
+        if(viewDepth >= (int)iterBufs.size())
+            iterBufs.emplace_back();
+        std::vector<Entity>& iterBuf = iterBufs[viewDepth];
         iterBuf.assign(sets[min]->getOwners().begin(), sets[min]->getOwners().end());
 
+        ++viewDepth;
         for(Entity e : iterBuf){
             if(isAlive(e) && (hasComponent<Components>(e) && ...)){
                 if constexpr (std::is_invocable_v<F, Entity, Components&...>) {
@@ -160,5 +165,6 @@ class ECS{
                 }
             }
         }
+        --viewDepth;
     }
 };
