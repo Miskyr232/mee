@@ -46,6 +46,22 @@ void addApple(ECS& ecs, EngineResources& res){
         }
     }
 }
+
+void createSnake(ECS& ecs){
+    ecs.createEntity(
+        SnakeHeadComponent{},
+        GridPosComponent{.pos = {0, 0}}
+    );
+    ecs.createEntity(
+        SnakeSegmentComponent{},
+        GridPosComponent{.pos = {-1, 0}}
+    );
+    ecs.createEntity(
+        SnakeSegmentComponent{},
+        GridPosComponent{.pos = {-2, 0}}
+    );
+}
+
 int main(){
     Engine w;
     w.config.debug.enabled = true;
@@ -53,43 +69,13 @@ int main(){
     w.config.window.targetFPS = 60;
     w.pipeline.onStart(
         [&](ECS& ecs, EngineResources& res){
-            ecs.createEntity(
-                SnakeHeadComponent{},
-                GridPosComponent{.pos = {0, 0}}
-            );
-            ecs.createEntity(
-                SnakeSegmentComponent{},
-                GridPosComponent{.pos = {-1, 0}}
-            );
-            ecs.createEntity(
-                SnakeSegmentComponent{},
-                GridPosComponent{.pos = {-2, 0}}
-            );
-            for(int i = -10; i <= 10; i += 1){
-                for(int j = -9; j <= 10; j += 1){
-                    if((i + j) % 2 == 0)
-                        ecs.createEntity(
-                            FoodComponent{},
-                            GridPosComponent{.pos = {i, j}}
-                        );
-                }
+            createSnake(ecs);
+            for(int i = 0; i <= 5; i++){
+                ecs.createEntity(
+                    FoodComponent{},
+                    GridPosComponent{.pos = {res.random.getRandomInt(-10, 10), res.random.getRandomInt(-10, 10)}}
+                );
             }
-            ecs.createEntity(
-                FoodComponent{},
-                GridPosComponent{.pos = {5, 0}}
-            );
-            ecs.createEntity(
-                FoodComponent{},
-                GridPosComponent{.pos = {5, 5}}
-            );
-            ecs.createEntity(
-                FoodComponent{},
-                GridPosComponent{.pos = {5, -5}}
-            );
-            ecs.createEntity(
-                FoodComponent{},
-                GridPosComponent{.pos = {-5, -5}}
-            );
         }
     );
     w.init();
@@ -140,7 +126,6 @@ int main(){
                             }
                         );
                     if(died){
-                        printf("died!\n");
                         ecs.view<SnakeHeadComponent>(
                             [&](Entity e, SnakeHeadComponent&){
                                 ecs.removeEntity(e);
@@ -151,6 +136,7 @@ int main(){
                                 ecs.removeEntity(e);
                             }
                         );
+                        createSnake(ecs);
                         return;
                     }
                     Vector2i prevPos = hp.pos;
@@ -201,7 +187,7 @@ int main(){
                         {
                             pos.pos.tof() * 100.0f,
                             Vector2f(100.0f),
-                            Color4f(0.0f, 0.9f, 0.0f)
+                            Color4f(0.0f, 0.96f, 0.0f)
                         }
                     );
                 }
