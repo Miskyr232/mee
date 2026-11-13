@@ -90,6 +90,7 @@ public:
 
 class ECS{
     std::vector<Slot> slots;
+    std::vector<Entity> iterBuf;
     std::vector<uint32_t> freeList;
 
     std::unordered_map<std::type_index, std::unique_ptr<StorageBase>> storages;
@@ -148,12 +149,16 @@ class ECS{
         for (std::size_t k = 1; k < sizeof...(Components); ++k)
             if (sets[k]->size() < sets[min]->size()) min = k;
 
-        for (Entity e : sets[min]->getOwners())
-            if ((hasComponent<Components>(e) && ...))
+        iterBuf.assign(sets[min]->getOwners().begin(), sets[min]->getOwners().end());
+
+        for(Entity e : iterBuf){
+            if(isAlive(e) && (hasComponent<Components>(e) && ...)){
                 if constexpr (std::is_invocable_v<F, Entity, Components&...>) {
                     f(e, getComponent<Components>(e)...);
                 }else if constexpr (std::is_invocable_v<F, Entity>) {
                     f(e);
                 }
+            }
+        }
     }
 };

@@ -1,6 +1,5 @@
 #include <mee/ecs/ecs.hpp>
 #include <cassert>
-#include <iostream>
 
 static void test_ecs(){
     ECS ecs;
@@ -12,7 +11,6 @@ static void test_ecs(){
     assert(ecs.isAlive(b));
     Entity c = ecs.createEntity();
     assert(a.index == c.index);
-    std::cout << "full test passed" << std::endl;
 }
 
 int main(){
