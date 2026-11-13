@@ -19,9 +19,12 @@ git clone https://github.com/Miskyr232/mee.git
 cd mee
 ./build.sh
 ./build/examples/games/snake-game/mee-snake-game
+```
 
 
 A game in 20 lines
+
+```cpp
 #include "mee/mee.hpp"
 
 int main(){
@@ -35,6 +38,7 @@ int main(){
 
     w.run();
 }
+```
 Examples
 - snake-game — ECS snake: components, systems, signals
 - langtons-ant — the classic, drawn with rects
