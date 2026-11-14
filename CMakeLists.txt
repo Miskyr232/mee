@@ -38,6 +38,7 @@ target_sources(mee PRIVATE
     src/utils/random.cpp
     src/utils/timer.cpp
     src/utils/text.cpp
+    src/utils/profiler.cpp
 
     src/systems/core/lifetime.cpp
     src/systems/render/render-sprite.cpp

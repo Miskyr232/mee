@@ -1,4 +1,5 @@
 #include "mee/utils/color.hpp"
+#include <cstdio>
 #include <mee/core/engine.hpp>
 #include <mee/components/core/transform.hpp>
 #include <mee/components/physics/aabb-collider.hpp>
@@ -34,23 +35,6 @@ Engine::~Engine(){
     CloseWindow();
 }
 
-void Engine::renderColliders() {
-    ecs.view<AABBColliderComponent, TransformComponent>(
-        [&](Entity e, AABBColliderComponent& aabb, TransformComponent& transform) {
-            AABB box = getAABB(transform, aabb);
-            Vector2f size = box.max - box.min;
-            res.renderer.renderRect(
-                {
-                    transform.pos - size / 2.0f,
-                    size,
-                    Color4f(0.8f, 0.0f, 0.0f, 0.5f)
-                },
-                10000
-            );
-        }
-    );
-}
-
 void Engine::exit(){
     running = false;
 }
@@ -65,6 +49,8 @@ void Engine::render(){
 
     if(config.debug.enabled && config.debug.showColliders)
         renderColliders();
+    if(config.debug.enabled && config.debug.showProfiler)
+        renderProfiler();
     res.renderer.flush(res.textureManager, res.camera);
     if(config.debug.enabled && config.debug.showFPS)
         DrawFPS(10, 10);
@@ -103,5 +89,51 @@ void Engine::run(){
         // if(printProfiler.update(dt)){
         //     Profiler::instance().printInfo();
         // }
+    }
+}
+
+void Engine::renderColliders() {
+    ecs.view<AABBColliderComponent, TransformComponent>(
+        [&](Entity e, AABBColliderComponent& aabb, TransformComponent& transform) {
+            AABB box = getAABB(transform, aabb);
+            Vector2f size = box.max - box.min;
+            res.renderer.renderRect(
+                {
+                    transform.pos - size / 2.0f,
+                    size,
+                    Color4f(0.8f, 0.0f, 0.0f, 0.5f)
+                },
+                10000
+            );
+        }
+    );
+}
+
+void Engine::renderProfiler(){
+    const auto& data = Profiler::instance().getData();
+    Vector2f pos(10, 30);
+
+    for(auto& pair : data){
+        float size = pair.second.average * 50.0f;
+        res.renderer.renderRect(
+            {
+                pos,
+                Vector2f(size, 20),
+                Color4f(1.0f, 0.0f, 0.0f, 0.5f)
+            },
+            20,
+            true
+        );
+        res.renderer.renderText(
+            {
+                pair.first,
+                pos + Vector2f(size + 5.0f, 0),
+                20.0f,
+                Color4f::Black()
+            },
+            20,
+            true
+        );
+        pos.y += 20;
     }
 }

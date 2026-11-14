@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 set -e
@@ -7,7 +6,7 @@ cmake -S . -B build \
     -DCMAKE_BUILD_TYPE=Release \
     -DMEE_BUILD_TESTS=ON \
     -DMEE_BUILD_EXAMPLES=ON \
-    -DCMAKE_INSTALL_PREFIX=~/.local
+    -DCMAKE_INSTALL_PREFIX=/usr/local
 
 cmake --build build -j$(nproc)
-cmake --install build
+sudo cmake --install build

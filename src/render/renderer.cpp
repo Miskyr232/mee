@@ -181,13 +181,16 @@ void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
             case CmdType::Text:{
                 flushPending(camera);
                 Vector2f screenPos = textCmds[k.index].position;
+                float size = textCmds[k.index].fontSize;
                 if(!k.isUI)
                     screenPos = camera.worldToScreen(textCmds[k.index].position);
+                if(!k.isUI)
+                    size *= camera.zoom;
                 DrawText(
                     textCmds[k.index].text.c_str(),
                     screenPos.x,
                     screenPos.y,
-                    textCmds[k.index].fontSize * camera.zoom,
+                    size,
                     textCmds[k.index].color.toRaylib()
                 );
                 break;
@@ -195,6 +198,10 @@ void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
             case CmdType::Rect:{
                 if(!circles.empty() || !rings.empty() || !lines.empty())
                     flushPending(camera);
+                if(k.isUI){
+                    rectCmds[k.index].position = camera.screenToWorld(rectCmds[k.index].position);
+                    rectCmds[k.index].size /= camera.zoom;
+                }
                 rects.push_back(rectCmds[k.index]);
                 break;
             }

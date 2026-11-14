@@ -10,9 +10,9 @@
 #include "mee/systems/physics/move.hpp"
 #include "mee/utils/profiler.hpp"
 #include <cmath>
-#include <cstdio>
 #include <raylib.h>
 #include <string>
+#include <iostream>
 #include <vector>
 
 static float leftK = 1.5f;
@@ -145,9 +145,6 @@ int main(){
             if(res.input.isKeyDown(KEY_X)){
                 spread -= 0.01f * dt / 0.016f;
                 updateTree(res, Vector2f(100, 100), angle, 1, spread);
-            }
-            if(t.update(dt)){
-                std::cout << lines.size() << std::endl;
             }
         }
     );

@@ -25,5 +25,6 @@ public:
 
     void init();
     void renderColliders();
+    void renderProfiler();
     void exit();
 };

@@ -4,4 +4,5 @@ struct DebugConfig{
     bool showFPS = true;
     bool showColliders = false;
     bool showEntityCount = false;
+    bool showProfiler = true;
 };

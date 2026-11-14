@@ -1,11 +1,8 @@
 #include <chrono>
-#include <cmath>
-#include <cstdio>
 #include <functional>
 #include <string>
-#include <string_view>
 #include <unordered_map>
-#include <iostream>
+#include <utility>
 #include "mee/utils/text.hpp"
 
 struct ProfiledFunc{
@@ -17,22 +14,29 @@ struct ProfiledFunc{
 
 class Profiler{
     std::unordered_map<std::string, ProfiledFunc> profiledFuncs;
+    std::vector<std::pair<std::string, ProfiledFunc>> toOut;
+
     float measureInterval = 1.0f; //sec
     float time = 0.0f;
 
     void updateAverageTime(){
+        toOut.clear();
         for(auto& pair : profiledFuncs){
             auto& p = pair.second;
             p.average = p.acum / (float)p.amount;
+            toOut.push_back({pair.first, pair.second});
         }
-        printInfo();
         for(auto& pair : profiledFuncs){
             auto& p = pair.second;
             p.acum = 0.0f;
             p.amount = 0;
         }
+        std::sort(toOut.begin(), toOut.end(), [](std::pair<std::string, ProfiledFunc> first, std::pair<std::string, ProfiledFunc> second) {
+            return first.second.average > second.second.average;
+        });
     }
 public:
+    const std::vector<std::pair<std::string, ProfiledFunc>>& getData();
     static Profiler& instance(){
         static Profiler profiler;
         return profiler;
@@ -78,18 +82,4 @@ public:
             updateAverageTime();
         }
     };
-    void printInfo(){
-        printf("%s", Text::padRight("", 15).c_str());
-        printf("%s", Text::padRight("last", 15).c_str());
-        printf("%s", Text::padRight("average", 15).c_str());
-        printf("%s\n", Text::padRight("amount", 15).c_str());
-        for(auto pair : profiledFuncs){
-            printf("%s\n", Text::repeat("-", 60).c_str());
-            printf("%s", Text::padRight(pair.first, 15).c_str());
-            printf("%s", (Text::padRight(Text::remove_trailing_zeros(pair.second.last, 3) + " ms", 15)).c_str());
-            printf("%s", (Text::padRight(Text::remove_trailing_zeros(pair.second.average, 3) + " ms", 15)).c_str());
-            printf("%s\n", Text::padRight(std::to_string(pair.second.amount), 15).c_str());
-        }
-        printf("\n");
-    }
 };
