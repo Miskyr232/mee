@@ -27,13 +27,15 @@ public:
         }
         return result;
     }
-    static std::string remove_trailing_zeros(float num, int precision)  {
-        std::string str = std::to_string(num);
-        str.erase(str.find('.') + precision + 1);
-        str.erase(str.find_last_not_of('0') + 1, std::string::npos );
-        if (str.back() == '.')
+    static std::string trimFloat(float num, int precision){
+        char buf[32];
+        std::snprintf(buf, sizeof buf, "%.*f", precision, num);
+        std::string str(buf);
+        str.erase(str.find_last_not_of('0') + 1);
+        if(str.back() == '.')
             str.pop_back();
-
+        if(str == "-0")
+            str = "0";
         return str;
     }
 };

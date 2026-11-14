@@ -98,14 +98,6 @@ int main(){
             for(auto& cmd : lines){
                 res.renderer.renderLine(cmd);
             }
-            res.renderer.renderText(
-                {
-                    std::to_string(angle),
-                    res.camera.screenToWorld(Vector2f(0, 40)),
-                    20 / res.camera.zoom,
-                    Color4f::Black()
-                }
-            );
         }
     );
     w.pipeline.onUpdate(

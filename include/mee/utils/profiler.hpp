@@ -1,8 +1,10 @@
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 #include "mee/utils/text.hpp"
 
 struct ProfiledFunc{
@@ -16,14 +18,13 @@ class Profiler{
     std::unordered_map<std::string, ProfiledFunc> profiledFuncs;
     std::vector<std::pair<std::string, ProfiledFunc>> toOut;
 
-    float measureInterval = 1.0f; //sec
     float time = 0.0f;
 
     void updateAverageTime(){
         toOut.clear();
         for(auto& pair : profiledFuncs){
             auto& p = pair.second;
-            p.average = p.acum / (float)p.amount;
+            p.average = p.amount > 0 ? p.acum / (float)p.amount : 0.0f;
             toOut.push_back({pair.first, pair.second});
         }
         for(auto& pair : profiledFuncs){
@@ -36,6 +37,7 @@ class Profiler{
         });
     }
 public:
+    float measureInterval = 1.0f; //sec
     const std::vector<std::pair<std::string, ProfiledFunc>>& getData();
     static Profiler& instance(){
         static Profiler profiler;

@@ -5,14 +5,13 @@
 #include "mee/core/config/engine-config.hpp"
 #include "mee/engine-resources/engine-resources.hpp"
 #include "mee/render/texture-manager.hpp"
-#include "mee/utils/timer.hpp"
 
 class Engine{
     bool running = true;
     TextureID colliderTextureID;
-    void render();
+    void render(float dt);
     void update(float dt);
-    Timer printProfiler;
+    std::unordered_map<std::string, float> m_smoothedSizes;
 public:
     EngineConfig config;
     ECS ecs;
@@ -25,6 +24,6 @@ public:
 
     void init();
     void renderColliders();
-    void renderProfiler();
+    void renderProfiler(float dt);
     void exit();
 };
