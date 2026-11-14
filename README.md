@@ -22,6 +22,28 @@ cd mee
 ```
 
 
+## Using in your own project
+
+Once you have installed the engine using `./build.sh` (which installs it to `/usr/local` by default), you can easily use it in your own CMake projects:
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+project(my_game LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Find the installed mee engine
+find_package(mee CONFIG REQUIRED)
+
+add_executable(my_game
+    src/main.cpp
+)
+
+# Link the engine — include paths are handled automatically
+target_link_libraries(my_game PRIVATE mee::mee)
+```
+
 A game in 20 lines
 
 ```cpp
@@ -39,11 +61,11 @@ int main(){
     w.run();
 }
 ```
+
 Examples
 - snake-game — ECS snake: components, systems, signals
 - langtons-ant — the classic, drawn with rects
 - tree — 250k lines: a renderer stress test
+
 Status
 Experimental. The API is unstable (v0.x). Licensed under the zlib license.
-Build & CI
-build
