@@ -32,6 +32,7 @@ project(my_game LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON) # Optional: for clangd / LSP support
 
 # Find the installed mee engine
 find_package(mee CONFIG REQUIRED)
