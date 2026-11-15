@@ -6,10 +6,8 @@
 #include <mee/utils/profiler.hpp>
 #include <mee/engine-resources/camera.hpp>
 #include <cstdio>
-#include <numeric>
 #include <raylib.h>
 #include <rlgl.h>
-#include <variant>
 #include <vector>
 
 void Renderer::init(){

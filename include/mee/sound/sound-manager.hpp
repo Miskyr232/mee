@@ -1,19 +1,21 @@
 #pragma once
 
-#include <cstdint>
+#include "mee/utils/resource-manager.hpp"
 #include <raylib.h>
-#include <unordered_map>
 #include <string>
 
-using SoundID = uint32_t;
+using SoundID = size_t;
 
 class SoundManager{
-    std::unordered_map<std::string, SoundID> pathToID;
-    std::unordered_map<SoundID, Sound> sounds;
-    SoundID next = 0;
-
-    public:
-    SoundID loadSound(const std::string& path);
-    const Sound& getSound(SoundID id) const;
-    ~SoundManager();
+    ResourceManager<Sound, SoundID> sounds;
+public:
+    SoundID loadSound(const std::string path){
+        return sounds.load(path, [](const char* path){return LoadSound(path);});
+    }
+    const Sound& getSound(SoundID id){
+        return sounds.get(id);
+    }
+    ~SoundManager(){
+        sounds.clear([](Sound& sound){UnloadSound(sound);});
+    }
 };

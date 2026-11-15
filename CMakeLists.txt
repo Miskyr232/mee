@@ -25,10 +25,7 @@ target_sources(mee PRIVATE
     src/core/pipeline.cpp
 
     src/render/particle-manager.cpp
-    src/render/texture-manager.cpp
     src/render/renderer.cpp
-
-    src/sound/sound-manager.cpp
 
     src/engine-resources/input-state.cpp
     src/engine-resources/camera.cpp
