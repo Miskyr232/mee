@@ -9,4 +9,4 @@ cmake -S . -B build \
     -DCMAKE_INSTALL_PREFIX=/usr/local
 
 cmake --build build -j$(nproc)
-sudo cmake --install build
+cmake --install build

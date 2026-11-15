@@ -9,6 +9,7 @@
 #include <mee/utils/profiler.hpp>
 #include <mee/systems/physics/aabb-collision.hpp>
 #include <raylib.h>
+#include <string>
 
 void Engine::init(){
     if(config.window.resizable)
@@ -44,6 +45,7 @@ void Engine::render(float dt){
     res.renderer.beginFrame();
 
     ClearBackground(config.window.backgroundColor.toRaylib());
+    res.background.renderBackground(res);
     pipeline.runDraw(ecs, res);
     res.particleManager.draw(res);
 
@@ -53,6 +55,8 @@ void Engine::render(float dt){
         Profiler::instance().measure("render profiler", [&]{
             renderProfiler(dt);
         });
+    if(config.debug.enabled && config.debug.showRenderCalls)
+        renderRenderCallsAmount();
     res.renderer.flush(res.textureManager, res.camera);
     if(config.debug.enabled && config.debug.showFPS)
         DrawFPS(10, 10);
@@ -83,13 +87,14 @@ void Engine::run(){
             render(dt);
         });
 
-        Profiler::instance().measure("wait fps", [&]{
+        Profiler::instance().measure("idle", [&]{
             endRender();
         });
 
         Profiler::instance().measure("update profiler", [&]{
             Profiler::instance().update(dt);
         });
+        nextDebugRenderPosY = 25;
     }
 }
 
@@ -112,7 +117,6 @@ void Engine::renderColliders() {
 
 void Engine::renderProfiler(float dt){
     const auto& data = Profiler::instance().getData();
-    Vector2f pos(10, 30);
 
     float threshold = 400.0f;
 
@@ -138,21 +142,21 @@ void Engine::renderProfiler(float dt){
         it->second += (targetSize - it->second) * (lerpSpeed * dt);
         float size = it->second < 2.0f ? 2.0f : it->second;
 
-        const std::string& text = Text::padRight(Text::trimFloat(pair.second.average, 4), 8);
+        const std::string& text = "ms " + Text::padRight(Text::trimFloat(pair.second.average, 4), 8);
         float textSize = text.size() * 20 * 0.6;
         res.renderer.renderText(
             {
                 text,
-                pos,
+                Vector2f(10, nextDebugRenderPosY),
                 20.0f,
-                Color4f::Black()
+                config.debug.contrastColor
             },
             20,
             true
         );
         res.renderer.renderRect(
             {
-                pos + Vector2f(textSize, 0),
+                Vector2f(10, nextDebugRenderPosY) + Vector2f(textSize, 0),
                 Vector2f(size, 20),
                 Color4f(1.0f, 0.0f, 0.0f, 0.8f)
             },
@@ -162,13 +166,28 @@ void Engine::renderProfiler(float dt){
         res.renderer.renderText(
             {
                 pair.first,
-                pos + Vector2f(5.0f + size + textSize, 0),
+                Vector2f(10, nextDebugRenderPosY) + Vector2f(5.0f + size + textSize, 0),
                 20.0f,
-                Color4f::Black()
+                config.debug.contrastColor
             },
             20,
             true
         );
-        pos.y += 20;
+        nextDebugRenderPosY += 20;
     }
+}
+
+void Engine::renderRenderCallsAmount(){
+    int callsAmount = res.renderer.getRenderCallsAmount();
+    res.renderer.renderText(
+        {
+            std::to_string(callsAmount),
+            Vector2f(10, nextDebugRenderPosY),
+            20,
+            config.debug.contrastColor
+        },
+        20,
+        true
+    );
+    nextDebugRenderPosY += 20;
 }

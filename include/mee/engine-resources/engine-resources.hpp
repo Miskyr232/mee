@@ -9,6 +9,7 @@
 #include <mee/ecs/ecs.hpp>
 #include <mee/sound/sound-manager.hpp>
 #include <mee/utils/random.hpp>
+#include <mee/engine-resources/background.hpp>
 
 struct EngineResources{
     TextureManager textureManager;
@@ -17,6 +18,7 @@ struct EngineResources{
     Random random;
     WorldCamera camera;
     ParticleManager particleManager;
+    Background background;
     Renderer renderer;
     Signal<Entity, Entity> collisionSignal;
     Signal<> engineEnd;

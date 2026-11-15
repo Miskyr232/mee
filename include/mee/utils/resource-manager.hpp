@@ -1,10 +1,11 @@
 #pragma once
 
+#include <cstdint>
 #include <deque>
 #include <string>
 #include <unordered_map>
 
-template <typename Resource, typename ID = size_t>
+template <typename Resource, typename ID = uint32_t>
 class ResourceManager {
     std::unordered_map<std::string, ID> pathToID;
     std::deque<Resource> resources;
@@ -35,5 +36,8 @@ public:
         }
         resources.clear();
         pathToID.clear();
+    }
+    bool isValidId(ID id){
+        return id < resources.size();
     }
 };

@@ -66,7 +66,7 @@ int main(){
     Engine w;
     w.config.debug.enabled = true;
     w.config.debug.showColliders = true;
-    w.config.debug.showProfiler = true;
+    w.config.debug.showProfiler = false;
     w.config.window.targetFPS = 60;
     w.pipeline.onStart(
         [&](ECS& ecs, EngineResources& res){

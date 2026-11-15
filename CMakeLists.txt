@@ -29,6 +29,7 @@ target_sources(mee PRIVATE
 
     src/engine-resources/input-state.cpp
     src/engine-resources/camera.cpp
+    src/engine-resources/background.cpp
 
     src/utils/math.cpp
     src/utils/color.cpp

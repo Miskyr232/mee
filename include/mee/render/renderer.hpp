@@ -35,6 +35,8 @@ class Renderer{
     // we switched to REPEAT to avoid a GL state change on every tiled draw.
     unsigned int lastWrapTextureId = 0;
     bool hasWrapTexture = false;
+
+    int renderCallsAmount = 0;
 public:
     void init();
     void beginFrame();
@@ -50,4 +52,5 @@ public:
     void flushRings(const std::vector<RingCmd>& rings, WorldCamera& camera);
     void flushLines(const std::vector<LineCmd>& lines, WorldCamera& camera);
     void flushPending(WorldCamera& camera);
+    int getRenderCallsAmount() const;
 };

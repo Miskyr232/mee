@@ -3,6 +3,7 @@
 #include <mee/engine-resources/camera.hpp>
 #include <mee/utils/vector.hpp>
 #include <mee/utils/math.hpp>
+#include <raylib.h>
 
 void WorldCamera::updateRotationCache(){
     if(rotation == cachedRotation)
@@ -13,35 +14,31 @@ void WorldCamera::updateRotationCache(){
     cachedRotation = rotation;
 }
 
-Vector2f WorldCamera::worldToScreen(Vector2f world){
-    updateRotationCache();
-
+Vector2f WorldCamera::worldToScreen(Vector2f world) const{
     Vector2f relative = world - pos - shakePos;
 
-    double rotatedX = relative.x * cachedCos - relative.y * cachedSin;
-    double rotatedY = relative.x * cachedSin + relative.y * cachedCos;
+    float rotatedX = relative.x * cachedCos - relative.y * cachedSin;
+    float rotatedY = relative.x * cachedSin + relative.y * cachedCos;
 
     return {
-        static_cast<float>(rotatedX * zoom + GetScreenWidth() * 0.5),
-        static_cast<float>(rotatedY * zoom + GetScreenHeight() * 0.5)
+        rotatedX * zoom + screenCenter.x,
+        rotatedY * zoom + screenCenter.y
     };
 }
 
-Vector2f WorldCamera::screenToWorld(Vector2f screen){
-    updateRotationCache();
-
+Vector2f WorldCamera::screenToWorld(Vector2f screen) const{
     Vector2f relative = {
-        (screen.x - GetScreenWidth() * 0.5f) / zoom,
-        (screen.y - GetScreenHeight() * 0.5f) / zoom
+        (screen.x - screenCenter.x) / zoom,
+        (screen.y - screenCenter.y) / zoom
     };
 
     // inverse rotation: cos stays the same, sin flips sign
-    double rotatedX = relative.x * cachedCos + relative.y * cachedSin;
-    double rotatedY = -relative.x * cachedSin + relative.y * cachedCos;
+    float rotatedX = relative.x * cachedCos + relative.y * cachedSin;
+    float rotatedY = -relative.x * cachedSin + relative.y * cachedCos;
 
     return {
-        static_cast<float>(rotatedX + pos.x + shakePos.x),
-        static_cast<float>(rotatedY + pos.y + shakePos.y)
+        rotatedX + pos.x + shakePos.x,
+        rotatedY + pos.y + shakePos.y
     };
 }
 
@@ -73,6 +70,9 @@ void WorldCamera::update(EngineResources& res, float dt){
             isMoving = false;
         }
     }
+    if(IsWindowResized()){
+        screenCenter = Vector2f(GetScreenWidth(), GetScreenHeight()) / 2.0f;
+    }
 }
 
 void WorldCamera::moveTo(Vector2f target, float duration){
@@ -84,4 +84,9 @@ void WorldCamera::moveTo(Vector2f target, float duration){
     if(!isMoving){
         pos = targetPos;
     }
+}
+
+void WorldCamera::setRotation(float targetRotation){
+    rotation = targetRotation;
+    updateRotationCache();
 }

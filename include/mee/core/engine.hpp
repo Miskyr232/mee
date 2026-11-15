@@ -12,6 +12,7 @@ class Engine{
     void render(float dt);
     void update(float dt);
     std::unordered_map<std::string, float> m_smoothedSizes;
+    int nextDebugRenderPosY = 25;
 public:
     EngineConfig config;
     ECS ecs;
@@ -26,4 +27,5 @@ public:
     void renderColliders();
     void renderProfiler(float dt);
     void exit();
+    void renderRenderCallsAmount();
 };
