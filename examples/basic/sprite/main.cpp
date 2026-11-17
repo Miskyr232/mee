@@ -31,6 +31,7 @@ int main(){
     Engine w;
     w.config.debug.enabled = false;
     w.config.debug.showColliders = true;
+    w.config.debug.contrastColor = Color4f::Black();
     w.init();
 
     Entity player = w.ecs.createEntity(

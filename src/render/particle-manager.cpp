@@ -31,33 +31,15 @@ void ParticleManager::draw(EngineResources& res){
         if (emitter && emitter->onDraw) {
             emitter->onDraw(particle, res);
         }else {
-            Vector2 screenPos = res.camera.worldToScreen({particle.pos.x, particle.pos.y}).toRaylib();
-            Texture& texture = particle.texture;
-            Rectangle source = {
-                0.0f, 0.0f,
-                (float)texture.width,
-                (float)texture.height
-            };
-
-            float zoom = res.camera.zoom;
-            Rectangle dest = {
-                screenPos.x, screenPos.y,
-                zoom * particle.textureScale.x * particle.scale,
-                zoom * particle.textureScale.y * particle.scale
-            };
-
-            Vector2 origin = {
-                zoom * particle.textureScale.x * particle.scale * 0.5f,
-                zoom * particle.textureScale.y * particle.scale * 0.5f
-            };
-
-            DrawTexturePro(
-                texture,
-                source,
-                dest,
-                origin,
-                particle.rotation,
-                particle.color
+            res.renderer.renderTexture(
+                {
+                    particle.texture,
+                    particle.pos,
+                    particle.scale,
+                    Vector2f(0.5f, 0.5f),
+                    0.0f,
+                    particle.color
+                }
             );
         }
     }
@@ -74,9 +56,7 @@ void ParticleManager::emit(EmitterHandle handle, EngineResources& res) {
         float angle = (settings.transform.rotation + spreadRand * settings.spread) * DEG2RAD;
         float speedMul = 1.0f + speedRand * settings.speedRandom;
 
-        Texture particleTexture = res.textureManager.getTexture(settings.textureID);
-
-        Color color = settings.color;
+        Color4f color = settings.color;
 
         float r_offset = ((GetRandomValue(0, 200) - 100) / 100.0f) * settings.colorRandom;
         float g_offset = ((GetRandomValue(0, 200) - 100) / 100.0f) * settings.colorRandom;
@@ -99,7 +79,7 @@ void ParticleManager::emit(EmitterHandle handle, EngineResources& res) {
             .lifeTime = settings.lifetime,
             .maxLifeTime = settings.lifetime,
             .color = color,
-            .texture = particleTexture,
+            .texture = settings.texture,
             .rotation = settings.transform.rotation,
             .gravity = settings.gravity,
             .drag = settings.drag,

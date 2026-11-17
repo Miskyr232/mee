@@ -16,7 +16,7 @@ Entity ECS::createEntity(){
 void ECS::removeEntity(Entity e){
     if(!isAlive(e) || e == Entity::Invalid())
         return;
-    for(auto& [type, storage] : storages){
+    for(auto& storage : storages){
         storage->erase(e);
     }
     slots[e.index].alive = false;

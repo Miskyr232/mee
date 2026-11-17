@@ -9,14 +9,14 @@ struct AABB {
     Vector2f max;
 };
 
-struct CollisionObject {
+struct Body{
     Entity entity;
 
     TransformComponent* transform;
     AABBColliderComponent* collider;
     RigidbodyComponent* rigidbody;
+    AABB box;
 };
-
 
 void aabbCollideSystem(ECS& ecs, EngineResources& res, float dt);
 AABB getAABB(const TransformComponent& t, const AABBColliderComponent& c);

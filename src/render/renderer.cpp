@@ -194,7 +194,7 @@ void Renderer::flush(TextureManager& textureManager, WorldCamera& camera){
                     flushTextureBatch();
 
                 if(!circles.empty() || !rings.empty() || !lines.empty() || !rects.empty())
-                    flushPending(camera);
+                    flushAll();
 
                 if(texBatch.empty())
                     batchTexId = texture.id;

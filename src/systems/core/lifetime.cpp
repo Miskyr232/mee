@@ -3,14 +3,10 @@
 #include <mee/ecs/ecs.hpp>
 
 void lifetimeSystem(ECS& ecs, EngineResources& res, float dt){
-    std::vector<Entity> toDelete;
-    ecs.view<LifetimeCompnent>([&](Entity e, LifetimeCompnent l){
+    ecs.view<LifetimeCompnent>([&](Entity e, LifetimeCompnent& l){
         l.elapsed += dt;
         if(l.elapsed >= l.lifetime){
-            toDelete.push_back(e);
+            ecs.removeEntity(e);
         }
     });
-    for(Entity e : toDelete){
-        ecs.removeEntity(e);
-    }
 }

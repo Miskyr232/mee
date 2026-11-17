@@ -80,6 +80,7 @@ int main(){
     w.config.debug.enabled = true;
     w.config.debug.showColliders = true;
     w.config.window.targetFPS = 60;
+    w.config.debug.contrastColor = Color4f::Black();
     w.init();
 
     float angle = -3.14 / 2.0f;

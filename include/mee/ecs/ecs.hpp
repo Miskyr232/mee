@@ -1,12 +1,13 @@
 #pragma once
 
+#include "mee/ecs/type.hpp"
+
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <limits>
 #include <memory>
-#include <typeindex>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 #include <type_traits>
@@ -90,17 +91,26 @@ public:
 
 class ECS{
     std::vector<Slot> slots;
-    std::vector<std::vector<Entity>> iterBufs;
+    std::deque<std::vector<Entity>> iterBufs;
     int viewDepth = 0;
     std::vector<uint32_t> freeList;
 
-    std::unordered_map<std::type_index, std::unique_ptr<StorageBase>> storages;
+    std::vector<std::unique_ptr<StorageBase>> storages;
 
     template<typename T>
     Storage<T>& storage(){
-        auto& ptr = storages[typeid(T)];
+        const std::size_t id = mee::detail::typeId<T>();
+        if(id >= storages.size()){
+            storages.resize(id + 1);
+        }
+        auto& ptr = storages[id];
         if(!ptr) ptr = std::make_unique<Storage<T>>();
-        return *static_cast<Storage<T>*>(ptr.get());
+        return static_cast<Storage<T>&>(*ptr);
+    }
+    std::vector<Entity>& iterBuf(){
+        while(viewDepth >= static_cast<int>(iterBufs.size()))
+            iterBufs.emplace_back();
+        return iterBufs[static_cast<std::size_t>(viewDepth)];
     }
     public:
     template<typename... Components>
@@ -115,13 +125,15 @@ class ECS{
 
     template<typename T>
     void addComponent(Entity e, T c){
-        if(e == Entity::Invalid())
+        if(e == Entity::Invalid() || !isAlive(e))
             return;
         storage<T>().add(e, std::move(c));
     }
 
     template<typename T>
     void addComponent(Entity e){
+        if(e == Entity::Invalid() || !isAlive(e))
+            return;
         T value;
         storage<T>().add(e, std::move(value));
     }
@@ -141,28 +153,33 @@ class ECS{
         storage<T>().erase(e);
     }
 
-    template<typename... Components, typename F>
-    void view(F&& f) {
-        static_assert(sizeof...(Components) >= 1);
-        StorageBase* sets[] = { &storage<Components>()... };
+    template<typename... Cs, typename F>
+    void view(F&& f){
+        static_assert(sizeof...(Cs) >= 1);
+
+        StorageBase* bases[] = { &storage<Cs>()... };
 
         std::size_t min = 0;
-        for (std::size_t k = 1; k < sizeof...(Components); ++k)
-            if (sets[k]->size() < sets[min]->size()) min = k;
+        for(std::size_t k = 1; k < sizeof...(Cs); ++k)
+            if(bases[k]->size() < bases[min]->size()) min = k;
 
-        if(viewDepth >= (int)iterBufs.size())
-            iterBufs.emplace_back();
-        std::vector<Entity>& iterBuf = iterBufs[viewDepth];
-        iterBuf.assign(sets[min]->getOwners().begin(), sets[min]->getOwners().end());
+        auto& buf = iterBuf();
+        buf.assign(bases[min]->getOwners().begin(), bases[min]->getOwners().end());
+
+        auto sets = std::tuple<Storage<Cs>*...>{ &storage<Cs>()... };
 
         ++viewDepth;
-        for(Entity e : iterBuf){
-            if(isAlive(e) && (hasComponent<Components>(e) && ...)){
-                if constexpr (std::is_invocable_v<F, Entity, Components&...>) {
-                    f(e, getComponent<Components>(e)...);
-                }else if constexpr (std::is_invocable_v<F, Entity>) {
+        if constexpr (std::is_invocable_v<F, Entity, Cs&...>) {
+            for(Entity e : buf){
+                if(!isAlive(e)) continue;
+                if(!(std::get<Storage<Cs>*>(sets)->has(e) && ...)) continue;
+                f(e, std::get<Storage<Cs>*>(sets)->dense[
+                        std::get<Storage<Cs>*>(sets)->sparse[e.index]]...);
+            }
+        } else {
+            for(Entity e : buf){
+                if(isAlive(e) && (std::get<Storage<Cs>*>(sets)->has(e) && ...))
                     f(e);
-                }
             }
         }
         --viewDepth;

@@ -24,7 +24,7 @@ public:
             return texture;
         });
     }
-    const Texture& getTexture(TextureID id){
+    const Texture& getTexture(TextureID id) const{
         return textures.get(id);
     }
     ~TextureManager(){

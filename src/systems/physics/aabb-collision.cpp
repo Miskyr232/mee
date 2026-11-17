@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cstddef>
 #include <mee/systems/physics/aabb-collision.hpp>
 #include <mee/components/core/transform.hpp>
 #include <mee/components/physics/aabb-collider.hpp>
@@ -91,30 +93,42 @@ void resolveAABB(
     rb.velocity -= impulse * invMassB;
 }
 void aabbCollideSystem(ECS &ecs, EngineResources &res, float dt){
-    std::vector<CollisionObject> objects;
+    static std::vector<Body> bodies;
+    bodies.clear();
     ecs.view<TransformComponent, AABBColliderComponent, RigidbodyComponent>(
-        [&](Entity e){
-            objects.push_back({
+        [&](Entity e, TransformComponent& transform, AABBColliderComponent& aabb, RigidbodyComponent& rb){
+            bodies.push_back({
                 e,
-                &ecs.getComponent<TransformComponent>(e),
-                &ecs.getComponent<AABBColliderComponent>(e),
-                &ecs.getComponent<RigidbodyComponent>(e)
+                &transform,
+                &aabb,
+                &rb,
+                getAABB(transform, aabb)
             }
         );
     });
-    for(int i = 0; i < objects.size(); i++){
-        for (int j = i + 1; j < objects.size(); j++) {
-            if(i == j)
-                continue;
-            CollisionObject a = objects[i];
-            CollisionObject b = objects[j];
-            AABB aabbA = getAABB(*a.transform, *a.collider);
-            AABB aabbB = getAABB(*b.transform, *b.collider);
+    std::sort(bodies.begin(), bodies.end(),
+        [](const Body& a, const Body& b){ return a.box.min.x < b.box.min.x; });
+    for(std::size_t i = 0; i < bodies.size(); i++){
+        const float maxX = bodies[i].box.max.x;
+        for(std::size_t j = i + 1; j < bodies.size() && bodies[j].box.min.x < maxX; ++j){
+            Body& a = bodies[i];
+            Body& b = bodies[j];
 
-            if (!intersects(aabbA, aabbB))
+            if(b.box.min.y >= a.box.max.y ||
+                b.box.max.y <= a.box.min.y)
+                    continue;
+
+            if(a.rigidbody->invMass == 0 && b.rigidbody->invMass == 0)
                 continue;
+
             res.collisionSignal.emit(a.entity, b.entity);
-            resolveAABB(*a.transform, *a.rigidbody, *a.collider, *b.transform, *b.rigidbody, *b.collider, aabbA, aabbB);
+
+            AABB aBox = getAABB(*bodies[i].transform, *bodies[i].collider);
+            AABB bBox = getAABB(*bodies[j].transform, *bodies[j].collider);
+
+            if(!intersects(aBox, bBox))
+                continue;
+            resolveAABB(*a.transform, *a.rigidbody, *a.collider, *b.transform, *b.rigidbody, *b.collider, a.box, b.box);
         }
     }
 }

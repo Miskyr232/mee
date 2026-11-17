@@ -13,7 +13,7 @@ template <typename T> struct Vector2 {
 
     constexpr Vector2() = default;
     constexpr Vector2(T x, T y) : x(x), y(y) {}
-    constexpr Vector2(T v) : x(v), y(x) {}
+    constexpr Vector2(T v) : x(v), y(v) {}
 
 
     constexpr Vector2 operator-() const { return {-x, -y}; }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mee/utils/color.hpp"
 #include <mee/utils/vector.hpp>
 #include <mee/utils/sparse-set.hpp>
 #include <mee/render/texture-manager.hpp>
@@ -32,9 +33,9 @@ struct ParticleEmitterSettings {
     Vector2f textureScale = Vector2f::one();
     float sizeRandom = 0.2f;
     float lifetime = 10.0f;
-    Color color = WHITE;
+    Color4f color = Color4f::White();
     float colorRandom = 0.0f;
-    TextureID textureID;
+    TextureID texture;
     float gravity = 0.0f;
     float drag = 10.0f;
     int count = 10;
@@ -47,8 +48,8 @@ struct Particle{
     Vector2f textureScale;
     float lifeTime;
     float maxLifeTime;
-    Color color;
-    Texture texture;
+    Color4f color;
+    TextureID texture;
     float rotation;
     bool fade;
     float gravity;

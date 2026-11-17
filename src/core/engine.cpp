@@ -105,7 +105,7 @@ void Engine::renderColliders() {
             Vector2f size = box.max - box.min;
             res.renderer.renderRect(
                 {
-                    transform.pos - size / 2.0f,
+                    transform.pos - size / 2.0f + aabb.offset,
                     size,
                     Color4f(0.8f, 0.0f, 0.0f, 0.5f)
                 },
