@@ -40,6 +40,8 @@ target_sources(mee PRIVATE
 
     src/systems/core/lifetime.cpp
     src/systems/render/render-sprite.cpp
+    src/systems/render/render-animation.cpp
+    src/systems/render/play-animation.cpp
     src/systems/render/camera-target.cpp
     src/systems/physics/aabb-collision.cpp
     src/systems/physics/move.cpp

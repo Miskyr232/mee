@@ -2,8 +2,8 @@
 
 A lightweight 2D ECS game engine built on C++20 and raylib.
 
-![snake gameplay](screenshots/snake/snake.gif)
-![snake screenshot](screenshots/snake/snake.png)
+![flappy bird](screenshots/flappy-bird/video.gif)
+![flappy bird](screenshots/flappy-bird/photo.png)
 
 ## Features
 

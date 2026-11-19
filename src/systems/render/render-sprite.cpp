@@ -10,7 +10,7 @@ void renderSpriteSystem(ECS& ecs, EngineResources& res) {
         res.renderer.renderTexture(
             {
                 s.texture,
-                t.pos,
+                t.pos + s.offset,
                 t.scale * s.scale,
                 Vector2f(0.5f, 0.5f),
                 t.rotation,

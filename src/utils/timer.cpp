@@ -1,9 +1,5 @@
 #include "mee/utils/timer.hpp"
 
-Timer::Timer(float duration_) : duration(duration_) {}
-
-Timer::Timer() : duration(1.0f) {}
-
 bool Timer::update(float dt){
     time += dt;
     if(time >= duration){

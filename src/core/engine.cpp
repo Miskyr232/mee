@@ -1,6 +1,5 @@
 #include "mee/render/texture-manager.hpp"
 #include "mee/utils/color.hpp"
-#include <cstdio>
 #include <mee/core/engine.hpp>
 #include <mee/components/core/transform.hpp>
 #include <mee/components/physics/aabb-collider.hpp>

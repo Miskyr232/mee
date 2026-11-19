@@ -14,7 +14,6 @@
 #include "mee/systems/physics/aabb-collision.hpp"
 #include "mee/systems/physics/move.hpp"
 #include "mee/components/tags/camera-target.hpp"
-#include <cstdio>
 #include <raylib.h>
 #include <string>
 
